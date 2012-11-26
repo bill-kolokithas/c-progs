@@ -46,8 +46,7 @@ char *read_word(int len) {
             break;
     }
     word[i] = '\0';
-    pword = calloc(strlen(word) + 1, sizeof(char));
-    if (pword == NULL)
+    if ((pword = calloc(strlen(word) + 1, sizeof(char))) == NULL)
         exit(EXIT_FAILURE);
 
     while (ch != '\n')
@@ -58,18 +57,13 @@ char *read_word(int len) {
 
 void insert_word(char *pword, char ***words_array, int *array_size, int *num_words) {
 
-    char **allocate_test;
-
     if (*array_size == 0) {
-        *words_array = malloc(SIZE_INCR * sizeof(char *));
-        if (*words_array == NULL)
+        if ((*words_array = malloc(SIZE_INCR * sizeof(char *))) == NULL)
             exit(EXIT_FAILURE);
         *array_size += SIZE_INCR;
     } else if (*array_size == *num_words) {
-        allocate_test = realloc(*words_array, (*array_size + SIZE_INCR) * sizeof(char *));
-        if (allocate_test == NULL)
+        if ((*words_array = realloc(*words_array, (*array_size + SIZE_INCR) * sizeof(char *))) == NULL)
             exit(EXIT_FAILURE);
-        *words_array = allocate_test;
         *array_size += SIZE_INCR;
     }
     (*words_array)[*num_words] = pword;
