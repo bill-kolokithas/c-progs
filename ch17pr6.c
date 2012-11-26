@@ -8,36 +8,30 @@
 #define WORD_MAX_LEN 10
 #define SIZE_INCR 1
 
-void read_word(char word[], int len);
-void insert_word(const char word[], char ***words_array, int *array_size, int num_words, int word_len);
+char *read_word(int len);
+void insert_word(char *pword, char ***words_array, int *array_size, int *num_words);
 void sort_words(char **words_array, int num_words);
 void print_words(char **words_array, int num_words);
 
 
 int main(void) {
 
-    char **words_array, temp_word[WORD_MAX_LEN + 1];
-    int array_size, num_words, word_len;
-    array_size = num_words = 0;
+    char **words_array, *pword;
+    int array_size = 0, num_words = 0;
 
-    do {
-        read_word(temp_word, WORD_MAX_LEN);
-        word_len = strlen(temp_word);
-        if (word_len > 0) {
-            insert_word(temp_word, &words_array, &array_size, num_words, word_len);
-            num_words++;
-        }
-    } while (word_len > 0);
-    
+    while (strlen(pword = read_word(WORD_MAX_LEN)) > 0)
+        insert_word(pword, &words_array, &array_size, &num_words);
+
     sort_words(words_array, num_words);
     print_words(words_array, num_words);
 
     return 0;
 }
 
-void read_word(char word[], int len) {
+char *read_word(int len) {
 
     int ch, i = 0;
+    char word[len + 1], *pword;
 
     printf("Enter word: ");
     while (isspace(ch = getchar()))
@@ -52,11 +46,17 @@ void read_word(char word[], int len) {
             break;
     }
     word[i] = '\0';
+    pword = calloc(strlen(word) + 1, sizeof(char));
+    if (pword == NULL)
+        exit(EXIT_FAILURE);
+
     while (ch != '\n')
         ch = getchar();
+
+    return strcpy(pword, word);
 }
 
-void insert_word(const char word[], char ***words_array, int *array_size, int num_words, int word_len) {
+void insert_word(char *pword, char ***words_array, int *array_size, int *num_words) {
 
     char **allocate_test;
 
@@ -65,17 +65,15 @@ void insert_word(const char word[], char ***words_array, int *array_size, int nu
         if (*words_array == NULL)
             exit(EXIT_FAILURE);
         *array_size += SIZE_INCR;
-    } else if (*array_size == num_words) {
+    } else if (*array_size == *num_words) {
         allocate_test = realloc(*words_array, (*array_size + SIZE_INCR) * sizeof(char *));
         if (allocate_test == NULL)
             exit(EXIT_FAILURE);
         *words_array = allocate_test;
         *array_size += SIZE_INCR;
     }
-    (*words_array)[num_words] = calloc(word_len + 1, sizeof(char));
-    if ((*words_array)[num_words] == NULL)
-        exit(EXIT_FAILURE);
-    strcpy((*words_array)[num_words], word);
+    (*words_array)[*num_words] = pword;
+    (*num_words)++;
 }
 
 void sort_words(char **words_array, int num_words) {
@@ -96,6 +94,9 @@ void print_words(char **words_array, int num_words) {
 
     int i;
 
+    if (num_words == 0)
+        return;
+    
     printf("In sorted order:");
     for (i = 0; i < num_words; i++)
         printf(" %s", words_array[i]);
