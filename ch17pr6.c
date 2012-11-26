@@ -80,15 +80,15 @@ void insert_word(const char word[], char ***words_array, int *array_size, int nu
 
 void sort_words(char **words_array, int num_words) {
 
-    char temp[WORD_MAX_LEN + 1];
+    char *temp;
     int i, j;
 
     for (i = 0; i < num_words - 1; i++)
         for (j = i + 1; j < num_words; j++)
             if (strcmp(words_array[i], words_array[j]) > 0) {
-                strcpy(temp, words_array[i]);
-                strcpy(words_array[i], words_array[j]);
-                strcpy(words_array[j], temp);
+                temp = words_array[i];
+                words_array[i] = words_array[j];
+                words_array[j] = temp;
             }
 }
 
