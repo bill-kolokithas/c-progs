@@ -15,14 +15,13 @@
 // Declarations
 typedef struct {
     char **words_array;
-    char *pword;
     int array_size;
     int num_words;
 } Container;
 
 // Prototypes
-char *read_word(Container *words);
-void insert_word(Container *words);
+char *read_word(char *word_pointer);
+void insert_word(char *word_pointer, Container *words);
 void sort_words(Container *words);
 void print_words(Container words);
 
@@ -30,9 +29,10 @@ void print_words(Container words);
 int main(void) {
 
     Container words = {.array_size = 0, .num_words = 0};
+    char *word_pointer;
 
-    while (read_word(&words) != NULL)
-        insert_word(&words);
+    while ((word_pointer = read_word(word_pointer)) != NULL)
+        insert_word(word_pointer, &words);
 
     sort_words(&words);
     print_words(words);
@@ -41,7 +41,7 @@ int main(void) {
 }
 
 // Read a word of WORD_MAX_LEN length and return a pointer to a dynamically allocated string
-char *read_word(Container *words) {
+char *read_word(char *word_pointer) {
 
     int ch;
     static char word[WORD_MAX_LEN + 1];
@@ -55,17 +55,17 @@ char *read_word(Container *words) {
 // Place back in buffer the first letter of the word (that we used to test for empty line)
     ungetc(ch, stdin);
     scanf("%"SCANF_LIMIT(WORD_MAX_LEN)"s", word);
-    if ((words->pword = calloc(strlen(word) + 1, sizeof(char))) == NULL)
+    if ((word_pointer = calloc(strlen(word) + 1, sizeof(char))) == NULL)
         exit(EXIT_FAILURE);
-    strcpy(words->pword, word);
+    strcpy(word_pointer, word);
 
     while (getchar() != '\n'); // "Eat" trailing white-spaces
 
-    return words->pword;
+    return word_pointer;
 }
 
 // Insert the word from read_word() to array
-void insert_word(Container *words) {
+void insert_word(char *word_pointer, Container *words) {
 
     if (words->array_size == 0) {
         if ((words->words_array = malloc(SIZE_INCR * sizeof(char *))) == NULL)
@@ -76,7 +76,7 @@ void insert_word(Container *words) {
             exit(EXIT_FAILURE);
         words->array_size += SIZE_INCR;
     }
-    words->words_array[words->num_words] = words->pword; // Copy the string pointer we created in read_word(), to array
+    words->words_array[words->num_words] = word_pointer; // Copy the string pointer we created in read_word(), to array
     words->num_words++;
 }
 
