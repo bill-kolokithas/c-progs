@@ -7,6 +7,8 @@
 
 #define WORD_MAX_LEN 10
 #define SIZE_INCR 1
+#define SCANF_LIMIT(x) SCANF_LIMIT2(x)
+#define SCANF_LIMIT2(x) #x
 
 char *read_word(int len);
 void insert_word(char *pword, char ***words_array, int *array_size, int *num_words);
@@ -19,7 +21,7 @@ int main(void) {
     char **words_array, *pword;
     int array_size = 0, num_words = 0;
 
-    while (strlen(pword = read_word(WORD_MAX_LEN)) > 0)
+    while ((pword = read_word(WORD_MAX_LEN)) != NULL)
         insert_word(pword, &words_array, &array_size, &num_words);
 
     sort_words(words_array, num_words);
@@ -30,29 +32,23 @@ int main(void) {
 
 char *read_word(int len) {
 
-    int ch, i = 0;
+    int ch;
     char word[len + 1], *pword;
 
     printf("Enter word: ");
     while (isspace(ch = getchar()))
         if (ch == '\n')
-            break;
+            return NULL;
 
-    while (ch != '\n' && ch != EOF) {
-        if (isalpha(ch) && i < len) {
-            word[i++] = ch;
-            ch = getchar();
-        } else
-            break;
-    }
-    word[i] = '\0';
+    ungetc(ch, stdin);
+    scanf("%"SCANF_LIMIT(WORD_MAX_LEN)"s", word);
     if ((pword = calloc(strlen(word) + 1, sizeof(char))) == NULL)
         exit(EXIT_FAILURE);
-
-    while (ch != '\n')
-        ch = getchar();
-
-    return strcpy(pword, word);
+    strcpy(pword, word);
+    
+    while (getchar() != '\n');
+    
+    return pword;
 }
 
 void insert_word(char *pword, char ***words_array, int *array_size, int *num_words) {
