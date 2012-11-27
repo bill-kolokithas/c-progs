@@ -47,7 +47,7 @@ char *read_word(int len) {
     strcpy(pword, word);
     
     while (getchar() != '\n');
-    
+
     return pword;
 }
 
@@ -69,15 +69,19 @@ void insert_word(char *pword, char ***words_array, int *array_size, int *num_wor
 void sort_words(char **words_array, int num_words) {
 
     char *temp;
-    int i, j;
+    int i, new_limit;
 
-    for (i = 0; i < num_words - 1; i++)
-        for (j = i + 1; j < num_words; j++)
-            if (strcmp(words_array[i], words_array[j]) > 0) {
+    do {
+        new_limit = 0;
+        for (i = 0; i < num_words - 1; i++)
+            if (strcmp(words_array[i], words_array[i + 1]) > 0) {
                 temp = words_array[i];
-                words_array[i] = words_array[j];
-                words_array[j] = temp;
+                words_array[i] = words_array[i + 1];
+                words_array[i + 1] = temp;
+                new_limit = i + 1;
             }
+        num_words = new_limit;
+    } while (num_words > 0);
 }
 
 void print_words(char **words_array, int num_words) {
