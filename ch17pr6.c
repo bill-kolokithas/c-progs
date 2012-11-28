@@ -17,22 +17,22 @@ typedef struct {
     char **words_array;
     int array_size;
     int num_words;
-} Container;
+} WordsList;
 
 // Prototypes
-char *read_word(char *word_pointer);
-void insert_word(char *word_pointer, Container *words);
-void sort_words(Container *words);
-void print_words(Container words);
+char *read_word();
+void insert_word(char *word_pointer, WordsList *words);
+void sort_words(WordsList *words);
+void print_words(WordsList words);
 
 
 int main(void) {
 
-    Container words = {.array_size = 0, .num_words = 0};
-    char *word_pointer;
+    WordsList words = {.array_size = 0, .num_words = 0};
+    char *word;
 
-    while ((word_pointer = read_word(word_pointer)) != NULL)
-        insert_word(word_pointer, &words);
+    while ((word = read_word()) != NULL)
+        insert_word(word, &words);
 
     sort_words(&words);
     print_words(words);
@@ -41,10 +41,11 @@ int main(void) {
 }
 
 // Read a word of WORD_MAX_LEN length and return a pointer to a dynamically allocated string
-char *read_word(char *word_pointer) {
+char *read_word() {
 
     int ch;
     static char word[WORD_MAX_LEN + 1];
+    char *word_pointer;
 
 // "Eat" white-spaces before word && return NULL if line is empty
     printf("Enter word: ");
@@ -65,7 +66,7 @@ char *read_word(char *word_pointer) {
 }
 
 // Insert the word from read_word() to array
-void insert_word(char *word_pointer, Container *words) {
+void insert_word(char *word_pointer, WordsList *words) {
 
     if (words->array_size == 0) {
         if ((words->words_array = malloc(SIZE_INCR * sizeof(char *))) == NULL)
@@ -81,7 +82,7 @@ void insert_word(char *word_pointer, Container *words) {
 }
 
 // Modified bubble-sort
-void sort_words(Container *words) {
+void sort_words(WordsList *words) {
 
     char *temp;
     int i, new_limit, num_words = words->num_words;
@@ -89,18 +90,19 @@ void sort_words(Container *words) {
 // After every pass all elements after the last swap are sorted. 
     do {
         new_limit = 0;
-        for (i = 0; i < num_words - 1; i++)
+        for (i = 0; i < num_words - 1; i++) {
             if (strcmp(words->words_array[i], words->words_array[i + 1]) > 0) {
                 temp = words->words_array[i];
                 words->words_array[i] = words->words_array[i + 1];
                 words->words_array[i + 1] = temp;
                 new_limit = i + 1;
             }
+        }
         num_words = new_limit;
     } while (num_words > 1);
 }
 
-void print_words(Container words) {
+void print_words(WordsList words) {
 
     int i;
 
