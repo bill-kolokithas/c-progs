@@ -21,8 +21,8 @@ typedef struct {
 
 // Prototypes
 char *read_word();
-void insert_word(char *word_pointer, WordsList *words);
-void sort_words(WordsList *words);
+WordsList *insert_word(char *word_pointer, WordsList *words);
+WordsList sort_words(WordsList words);
 void print_words(WordsList words);
 
 
@@ -32,10 +32,12 @@ int main(void) {
     char *word;
 
     while ((word = read_word()) != NULL)
-        insert_word(word, &words);
-
-    sort_words(&words);
-    print_words(words);
+        if (insert_word(word, &words) == NULL) {
+            puts("Allocation failed. Printing the array up to this point");
+            break;
+        }
+        
+    print_words(sort_words(words));
 
     return 0;
 }
@@ -57,7 +59,7 @@ char *read_word() {
     ungetc(ch, stdin);
     scanf("%"SCANF_LIMIT(WORD_MAX_LEN)"s", word);
     if ((word_pointer = calloc(strlen(word) + 1, sizeof(char))) == NULL)
-        exit(EXIT_FAILURE);
+        return NULL;
     strcpy(word_pointer, word);
 
     while (getchar() != '\n'); // "Eat" trailing white-spaces
@@ -66,40 +68,47 @@ char *read_word() {
 }
 
 // Insert the word from read_word() to array
-void insert_word(char *word_pointer, WordsList *words) {
+WordsList *insert_word(char *word_pointer, WordsList *words) {
+
+    char **realloc_test;
 
     if (words->array_size == 0) {
         if ((words->words_array = malloc(SIZE_INCR * sizeof(char *))) == NULL)
-            exit(EXIT_FAILURE);
+            return NULL;
         words->array_size += SIZE_INCR;
     } else if (words->array_size == words->num_words) { // Increase array when we need to add more words than our current limit
-        if ((words->words_array = realloc(words->words_array, (words->array_size + SIZE_INCR) * sizeof(char *))) == NULL)
-            exit(EXIT_FAILURE);
+        if ((realloc_test = realloc(words->words_array, (words->array_size + SIZE_INCR) * sizeof(char *))) == NULL)
+            return NULL;
+        words->words_array = realloc_test;
         words->array_size += SIZE_INCR;
     }
     words->words_array[words->num_words] = word_pointer; // Copy the string pointer we created in read_word(), to array
     words->num_words++;
+
+    return words;
 }
 
 // Modified bubble-sort
-void sort_words(WordsList *words) {
+WordsList sort_words(WordsList words) {
 
     char *temp;
-    int i, new_limit, num_words = words->num_words;
+    int i, new_limit, num_words = words.num_words;
 
 // After every pass all elements after the last swap are sorted. 
     do {
-        new_limit = 0;
+        new_limit = 1;
         for (i = 0; i < num_words - 1; i++) {
-            if (strcmp(words->words_array[i], words->words_array[i + 1]) > 0) {
-                temp = words->words_array[i];
-                words->words_array[i] = words->words_array[i + 1];
-                words->words_array[i + 1] = temp;
+            if (strcmp(words.words_array[i], words.words_array[i + 1]) > 0) {
+                temp = words.words_array[i];
+                words.words_array[i] = words.words_array[i + 1];
+                words.words_array[i + 1] = temp;
                 new_limit = i + 1;
             }
         }
         num_words = new_limit;
     } while (num_words > 1);
+
+    return words;
 }
 
 void print_words(WordsList words) {
@@ -109,7 +118,7 @@ void print_words(WordsList words) {
     if (words.num_words == 0)
         return;
 
-    printf("In sorted order:");
+    printf("Sorted:");
     for (i = 0; i < words.num_words; i++)
         printf(" %s", words.words_array[i]);
     puts("");
