@@ -22,7 +22,7 @@ typedef struct {
 // Prototypes
 char *read_word();
 WordsList *insert_word(char *word_pointer, WordsList *words);
-WordsList *sort_words(WordsList *words, int (*sort)(char *, char *));
+WordsList *sort_words(WordsList *words, int (*compare)(char *, char *));
 void print_words(WordsList words);
 
 // Sorting method prototypes
@@ -42,7 +42,7 @@ int main(void) {
             puts("Allocation failed. Printing the array up to this point");
             break;
         }
-    sort_words(&words, len_desc); 
+    sort_words(&words, alpha_asc); 
     print_words(words);
 
     return 0;
@@ -95,7 +95,7 @@ WordsList *insert_word(char *word_pointer, WordsList *words) {
 }
 
 // Modified bubble-sort
-WordsList *sort_words(WordsList *words, int (*sort)(char *, char *)) {
+WordsList *sort_words(WordsList *words, int (*compare)(char *, char *)) {
 
     char *temp;
     int i, new_limit, num_words = words->num_words;
@@ -104,7 +104,7 @@ WordsList *sort_words(WordsList *words, int (*sort)(char *, char *)) {
     do {
         new_limit = 1;
         for (i = 0; i < num_words - 1; i++) {
-            if (sort(words->words_array[i], words->words_array[i + 1]) > 0) {
+            if (compare(words->words_array[i], words->words_array[i + 1]) > 0) {
                 temp = words->words_array[i];
                 words->words_array[i] = words->words_array[i + 1];
                 words->words_array[i + 1] = temp;
