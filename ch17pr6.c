@@ -22,7 +22,7 @@ typedef struct {
 // Prototypes
 char *read_word();
 WordsList *insert_word(char *word_pointer, WordsList *words);
-WordsList sort_words(WordsList words);
+WordsList *sort_words(WordsList *words);
 void print_words(WordsList words);
 
 
@@ -36,8 +36,8 @@ int main(void) {
             puts("Allocation failed. Printing the array up to this point");
             break;
         }
-        
-    print_words(sort_words(words));
+    sort_words(&words); 
+    print_words(words);
 
     return 0;
 }
@@ -89,19 +89,19 @@ WordsList *insert_word(char *word_pointer, WordsList *words) {
 }
 
 // Modified bubble-sort
-WordsList sort_words(WordsList words) {
+WordsList *sort_words(WordsList *words) {
 
     char *temp;
-    int i, new_limit, num_words = words.num_words;
+    int i, new_limit, num_words = words->num_words;
 
 // After every pass all elements after the last swap are sorted. 
     do {
         new_limit = 1;
         for (i = 0; i < num_words - 1; i++) {
-            if (strcmp(words.words_array[i], words.words_array[i + 1]) > 0) {
-                temp = words.words_array[i];
-                words.words_array[i] = words.words_array[i + 1];
-                words.words_array[i + 1] = temp;
+            if (strcmp(words->words_array[i], words->words_array[i + 1]) > 0) {
+                temp = words->words_array[i];
+                words->words_array[i] = words->words_array[i + 1];
+                words->words_array[i + 1] = temp;
                 new_limit = i + 1;
             }
         }
