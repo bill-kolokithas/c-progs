@@ -52,13 +52,13 @@ int main(void) {
 char *read_word() {
 
     int ch;
-    static char word[WORD_MAX_LEN + 1];
+    char word[WORD_MAX_LEN + 1];
     char *word_pointer;
 
-// "Eat" white-spaces before word && return NULL if line is empty
+// "Eat" white-spaces before word && return NULL if line is empty or end of file
     printf("Enter word: ");
-    while (isspace(ch = getchar()))
-        if (ch == '\n')
+    while (isspace(ch = getchar()) || ch == EOF)
+        if (ch == '\n' || ch == EOF)
             return NULL;
 
 // Place back in buffer the first letter of the word (that we used to test for empty line)
