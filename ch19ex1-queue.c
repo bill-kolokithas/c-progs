@@ -16,6 +16,12 @@ static void terminate(const char *message) {
     exit(EXIT_FAILURE);
 }
 
+static int mod(int n1, int n2) {
+
+    return n1 < 0 ? (n1 % n2) + n2 : n1 % n2;
+}
+
+
 Queue create(void) {
 
     Queue q = malloc(sizeof(struct queue_type));
@@ -50,12 +56,12 @@ bool is_full(Queue q) {
 
 void push(Queue q, Item i) {
 
-    q->empty_slot %= MAX_SIZE;
 
     if (is_full(q))
         terminate("Error in push: Queue is full");
 
     q->queue[q->empty_slot++] = i;
+    q->empty_slot %= MAX_SIZE;
     q->num_items++;
 }
 
@@ -84,7 +90,7 @@ Item check_top(Queue q) {
 Item check_bot(Queue q) {
 
     if (!is_empty(q))
-        return q->queue[(q->empty_slot - 1) % MAX_SIZE];
+        return q->queue[mod(q->empty_slot - 1, MAX_SIZE)];
     else
         terminate("Queue is empty.");
 }
