@@ -15,6 +15,14 @@ int main(void)
     push(q1, 2);
     push(q1, 3);
     push(q1, 4);
+    push(q1, 5);
+    pop(q1);
+    pop(q1);
+    pop(q1);
+    pop(q1);
+
+
+
 
     printf("%d\n", check_top(q1));
     printf("%d\n", check_bot(q1));

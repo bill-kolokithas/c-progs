@@ -2,83 +2,73 @@
 #include <stdlib.h>
 #include "ch19ex1-queue.h"
 
-struct node {
-    Item data;
-    struct node *next;
-};
+#define MAX_SIZE 5
+
 
 struct queue_type {
-    struct node *top, *bot;
+    int queue[MAX_SIZE];
+    int num_items, empty_slot, remove_slot;
 };
 
 static void terminate(const char *message) {
-  
+
     printf("%s\n", message);
     exit(EXIT_FAILURE);
 }
 
-Queue create(void)
-{
+Queue create(void) {
+
     Queue q = malloc(sizeof(struct queue_type));
     if (q == NULL)
         terminate("Error in create: Queue could not be created.");
-    
-    q->top = NULL;
+
+    make_empty(q);
 
     return q;
 }
 
-void destroy(Queue q)
-{
+void destroy(Queue q) {
+
     make_empty(q);
     free(q);
 }
 
-void make_empty(Queue q)
-{
-    while (!is_empty(q))
-        pop(q);
+void make_empty(Queue q) {
+
+    q->num_items = q->empty_slot = q->remove_slot = 0;
 }
 
-bool is_empty(Queue q)
-{
-    return q->top == NULL;
+bool is_empty(Queue q) {
+
+    return q->num_items == 0;
 }
 
-bool is_full(Queue q)
-{
-    return false;
+bool is_full(Queue q) {
+
+    return q->num_items == MAX_SIZE;
 }
 
-void push(Queue q, Item i)
-{
-    struct node *new_node = malloc(sizeof(struct node));
-    if (new_node == NULL)
-        terminate("Error in push: Queue is full.");
+void push(Queue q, Item i) {
 
-    new_node->data = i;
-    new_node->next = NULL;
+    q->empty_slot %= MAX_SIZE;
 
-    if (q->top == NULL)
-        q->top = new_node;
-    else
-        q->bot->next = new_node;
+    if (is_full(q))
+        terminate("Error in push: Queue is full");
 
-    q->bot = new_node;
+    q->queue[q->empty_slot++] = i;
+    q->num_items++;
 }
 
 Item pop(Queue q) {
-  
-    struct node *old_top;
+
     Item i;
 
     if (is_empty(q))
         terminate("Error in pop: Queue is empty.");
 
-    old_top = q->top;
-    i = old_top->data;
-    q->top = old_top->next;
-    free(old_top);
+    i = q->queue[q->remove_slot++];
+    q->remove_slot %= MAX_SIZE;
+    q->num_items--;
 
     return i;
 }
@@ -86,7 +76,7 @@ Item pop(Queue q) {
 Item check_top(Queue q) {
 
     if (!is_empty(q))
-        return q->top->data;
+        return q->queue[q->remove_slot];
     else
         terminate("Queue is empty.");
 }
@@ -94,7 +84,7 @@ Item check_top(Queue q) {
 Item check_bot(Queue q) {
 
     if (!is_empty(q))
-        return q->bot->data;
+        return q->queue[(q->empty_slot - 1) % MAX_SIZE];
     else
         terminate("Queue is empty.");
 }
