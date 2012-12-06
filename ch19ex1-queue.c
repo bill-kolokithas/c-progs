@@ -94,3 +94,8 @@ Item check_bot(Queue q) {
     else
         terminate("Queue is empty.");
 }
+
+int check_numItems(Queue q) {
+
+    return q->num_items;
+}

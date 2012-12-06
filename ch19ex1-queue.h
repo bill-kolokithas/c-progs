@@ -16,5 +16,6 @@ void push(Queue q, Item i);
 Item pop(Queue q);
 Item check_top(Queue q);
 Item check_bot(Queue q);
+int check_numItems(Queue q);
 
 #endif
