@@ -42,7 +42,7 @@ int main(void) {
             puts("Allocation failed. Printing the array up to this point");
             break;
         }
-    sort_words(&words, alpha_asc); 
+    sort_words(&words, alpha_asc);
     print_words(words);
 
     return 0;
