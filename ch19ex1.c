@@ -16,11 +16,19 @@ int main(void)
     push(q1, 3);
     push(q1, 4);
     push(q1, 5);
+    push(q1, 5);
+    push(q1, 5);
+    push(q1, 5);
+    push(q1, 5);
+    push(q1, 5);
+    push(q1, 5);
+    push(q1, 5);
+    push(q1, 5);
     pop(q1);
     pop(q1);
     printf("%d\n", check_numItems(q1));
-    // pop(q1);
-    // pop(q1);
+    pop(q1);
+    pop(q1);
 
     printf("%d\n", check_top(q1));
     printf("%d\n", check_bot(q1));
@@ -28,6 +36,7 @@ int main(void)
     n = pop(q1);
     printf("Popped %d from q1\n", n);
     push(q2, n);
+    printf("num items %d\n", check_numItems(q1));
     n = pop(q1);
     printf("Popped %d from q1\n", n);
     push(q2, n);
