@@ -26,7 +26,15 @@ int main(void)
     push(q1, 5);
     pop(q1);
     pop(q1);
-    printf("%d\n", check_numItems(q1));
+    pop(q1);
+    pop(q1);
+    pop(q1);
+    pop(q1);
+    pop(q1);
+    pop(q1);
+    pop(q1);
+    pop(q1);
+    printf("items: %d\n", check_numItems(q1));
     pop(q1);
     pop(q1);
 

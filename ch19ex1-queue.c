@@ -82,6 +82,11 @@ Item pop(Queue q) {
 
     if (is_empty(q))
         terminate("Error in pop: Queue is empty.");
+    if (q->num_items <= q->size / 2) {
+        if ((q->queue = realloc(q->queue, (q->size / 2) * sizeof(Item))) == NULL)
+            terminate("Error in pop: Could not decrease Queue.");
+        q->size /= 2;
+    }
 
     i = q->queue[q->remove_slot++];
     q->remove_slot %= q->size;
@@ -92,18 +97,18 @@ Item pop(Queue q) {
 
 Item check_top(Queue q) {
 
-    if (!is_empty(q))
-        return q->queue[q->remove_slot];
-    else
+    if (is_empty(q))
         terminate("Queue is empty.");
+
+    return q->queue[q->remove_slot];
 }
 
 Item check_bot(Queue q) {
 
-    if (!is_empty(q))
-        return q->queue[mod(q->empty_slot - 1, q->size)];
-    else
+    if (is_empty(q))
         terminate("Queue is empty.");
+
+    return q->queue[mod(q->empty_slot - 1, q->size)];
 }
 
 int check_numItems(Queue q) {
