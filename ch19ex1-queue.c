@@ -82,7 +82,7 @@ Item pop(Queue q) {
 
     if (is_empty(q))
         terminate("Error in pop: Queue is empty.");
-    if (q->num_items <= q->size / 2) {
+    if (q->num_items <= q->size / 2 - q->size / 8) {
         if ((q->queue = realloc(q->queue, (q->size / 2) * sizeof(Item))) == NULL)
             terminate("Error in pop: Could not decrease Queue.");
         q->size /= 2;

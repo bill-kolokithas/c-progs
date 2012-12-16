@@ -6,37 +6,16 @@
 int main(void)
 {
     Queue q1, q2;
-    int n;
+    int n, i;
 
     q1 = create();
     q2 = create();
 
-    push(q1, 1);
-    push(q1, 2);
-    push(q1, 3);
-    push(q1, 4);
-    push(q1, 5);
-    push(q1, 5);
-    push(q1, 5);
-    push(q1, 5);
-    push(q1, 5);
-    push(q1, 5);
-    push(q1, 5);
-    push(q1, 5);
-    push(q1, 5);
-    pop(q1);
-    pop(q1);
-    pop(q1);
-    pop(q1);
-    pop(q1);
-    pop(q1);
-    pop(q1);
-    pop(q1);
-    pop(q1);
-    pop(q1);
-    printf("items: %d\n", check_numItems(q1));
-    pop(q1);
-    pop(q1);
+    for (i = 0; i < 8; i++)
+        push(q1, i);
+
+    for (; i > 2; i--)
+        pop(q1);
 
     printf("%d\n", check_top(q1));
     printf("%d\n", check_bot(q1));
