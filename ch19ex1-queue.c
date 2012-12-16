@@ -7,7 +7,7 @@
 
 struct queue_type {
     int *queue;
-    int num_items, empty_slot, remove_slot, size;
+    int num_items, bot, top, size;
 };
 
 static void terminate(const char *message) {
@@ -23,8 +23,9 @@ static int mod(int n1, int n2) {
 
 Queue create(void) {
 
-    Queue q = malloc(sizeof(struct queue_type));
-    if (q == NULL)
+    Queue q;
+
+    if ((q = malloc(sizeof(struct queue_type))) == NULL)
         terminate("Error in create: Queue could not be created.");
 
     if ((q->queue = malloc(STARTING_SIZE * sizeof(Item))) == NULL)
@@ -45,7 +46,7 @@ void destroy(Queue q) {
 
 void make_empty(Queue q) {
 
-    q->num_items = q->empty_slot = q->remove_slot = q->size = 0;
+    q->num_items = q->bot = q->top = q->size = 0;
 }
 
 bool is_empty(Queue q) {
@@ -60,19 +61,20 @@ bool is_full(Queue q) {
 
 void push(Queue q, Item i) {
 
-    int j;
-
     if (is_full(q)) {
         if ((q->queue = realloc(q->queue, (q->size * 2) * sizeof(Item))) == NULL)
             terminate("Error in push: Could not increase Queue.");
-        q->size *= 2;
-        for (j = 0; j < q->remove_slot; j++)
-            q->queue[q->size / 2 + j] = q->queue[j];
-        q->empty_slot = q->size / 2 + j;
-    } else
-        q->empty_slot %= q->size;
 
-    q->queue[q->empty_slot++] = i;
+        int j;
+        for (j = 0; j < q->top; j++)
+            q->queue[q->size + j] = q->queue[j];
+
+        q->bot = q->size + j;
+        q->size *= 2;
+    } else
+        q->bot %= q->size;
+
+    q->queue[q->bot++] = i;
     q->num_items++;
 }
 
@@ -82,14 +84,29 @@ Item pop(Queue q) {
 
     if (is_empty(q))
         terminate("Error in pop: Queue is empty.");
+
     if (q->num_items <= q->size / 2 - q->size / 8) {
-        if ((q->queue = realloc(q->queue, (q->size / 2) * sizeof(Item))) == NULL)
-            terminate("Error in pop: Could not decrease Queue.");
+        int j, k;
         q->size /= 2;
+
+        if (q->bot > q->size) {
+            j = q->top >= q->size ? q->top : q->size;
+            for (k = 0; j < q->bot; j++)
+                q->queue[k++] = q->queue[j];
+            q->top = q->top >= q->size ? 0 : q->top;
+            q->bot = k;
+        }
+        else if (q->top >= q->size) {
+            for (j = q->size * 2 - q->top; j > 0; j--)
+                q->queue[q->size - j] = q->queue[j];
+            q->top = q->size - j;
+        }
+        if ((q->queue = realloc(q->queue, (q->size) * sizeof(Item))) == NULL)
+            terminate("Error in pop: Could not decrease Queue.");
     }
 
-    i = q->queue[q->remove_slot++];
-    q->remove_slot %= q->size;
+    i = q->queue[q->top++];
+    q->top %= q->size;
     q->num_items--;
 
     return i;
@@ -100,7 +117,7 @@ Item check_top(Queue q) {
     if (is_empty(q))
         terminate("Queue is empty.");
 
-    return q->queue[q->remove_slot];
+    return q->queue[q->top];
 }
 
 Item check_bot(Queue q) {
@@ -108,7 +125,7 @@ Item check_bot(Queue q) {
     if (is_empty(q))
         terminate("Queue is empty.");
 
-    return q->queue[mod(q->empty_slot - 1, q->size)];
+    return q->queue[mod(q->bot - 1, q->size)];
 }
 
 int check_numItems(Queue q) {

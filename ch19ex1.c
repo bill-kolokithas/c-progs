@@ -11,14 +11,17 @@ int main(void)
     q1 = create();
     q2 = create();
 
-    for (i = 0; i < 8; i++)
+    for (i = 0; i < 9; i++)
         push(q1, i);
 
-    for (; i > 2; i--)
+    for (; i > 0; i--)
         pop(q1);
 
-    printf("%d\n", check_top(q1));
-    printf("%d\n", check_bot(q1));
+    for (i = 0; i < 5; i++)
+        push(q1, i);
+
+    printf("top %d\n", check_top(q1));
+    printf("bot %d\n", check_bot(q1));
 
     n = pop(q1);
     printf("Popped %d from q1\n", n);
