@@ -11,14 +11,32 @@ int main(void)
     q1 = create();
     q2 = create();
 
-    for (i = 0; i < 9; i++)
+    for (i = 1; i <= 8; i++) {
         push(q1, i);
+        printf("push(%d)\n", i);
+    }
 
-    for (; i > 0; i--)
-        pop(q1);
+    // printf("*num(%d)\n", check_numItems(q1));
 
-    for (i = 0; i < 5; i++)
+    for (i = 1; i <= 6; i++)
+        printf("-pop(%d)\n", pop(q1));
+
+    // printf("*num(%d)\n", check_numItems(q1));
+
+    for (i = 1; i <= 2; i++) {
         push(q1, i);
+        printf("push(%d)\n", i);
+    }
+
+    // printf("*num(%d)\n", check_numItems(q1));
+
+    for (i = 1; i <= 4; i++)
+        printf("-pop(%d)\n", pop(q1));
+
+    // printf("*num(%d)\n", check_numItems(q1));
+
+    push(q1, 1);
+    push(q1, 2);
 
     printf("top %d\n", check_top(q1));
     printf("bot %d\n", check_bot(q1));

@@ -97,9 +97,9 @@ Item pop(Queue q) {
             q->bot = k;
         }
         else if (q->top >= q->size) {
-            for (j = q->size * 2 - q->top; j > 0; j--)
-                q->queue[q->size - j] = q->queue[j];
-            q->top = q->size - j;
+            for (j = k = q->size * 2 - q->top; j > 0; j--)
+                q->queue[q->size - j] = q->queue[q->size * 2 - j];
+            q->top = q->size - k;
         }
         if ((q->queue = realloc(q->queue, (q->size) * sizeof(Item))) == NULL)
             terminate("Error in pop: Could not decrease Queue.");
