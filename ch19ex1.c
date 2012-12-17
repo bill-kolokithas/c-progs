@@ -13,55 +13,60 @@ int main(void)
 
     for (i = 1; i <= 8; i++) {
         push(q1, i);
-        printf("push(%d)\n", i);
+        printf("q1 push(%d)\n", i);
     }
-
-    // printf("*num(%d)\n", check_numItems(q1));
+    printf("q1  num(%d) *\n", check_numItems(q1));
 
     for (i = 1; i <= 6; i++)
-        printf("-pop(%d)\n", pop(q1));
+        printf("q1  pop(%d)\n", pop(q1));
 
-    // printf("*num(%d)\n", check_numItems(q1));
+    printf("q1  num(%d) *\n", check_numItems(q1));
 
     for (i = 1; i <= 2; i++) {
         push(q1, i);
-        printf("push(%d)\n", i);
+        printf("q1 push(%d)\n", i);
     }
+    printf("q1  num(%d) *\n", check_numItems(q1));
 
-    // printf("*num(%d)\n", check_numItems(q1));
+    for (i = 1; i <= 1; i++)
+        printf("q1  pop(%d)\n", pop(q1));
 
-    for (i = 1; i <= 4; i++)
-        printf("-pop(%d)\n", pop(q1));
-
-    // printf("*num(%d)\n", check_numItems(q1));
-
-    push(q1, 1);
-    push(q1, 2);
-
-    printf("top %d\n", check_top(q1));
-    printf("bot %d\n", check_bot(q1));
+    printf("q1  num(%d) *\n", check_numItems(q1));
+    printf("q1  top(%d) check\n", check_top(q1));
+    printf("q1  bot(%d) check\n", check_bot(q1));
 
     n = pop(q1);
-    printf("Popped %d from q1\n", n);
+    printf("q1  pop(%d)\n", n);
     push(q2, n);
-    printf("num items %d\n", check_numItems(q1));
+    printf("q2 push(%d)\n", n);
     n = pop(q1);
-    printf("Popped %d from q1\n", n);
+    printf("q1  pop(%d)\n", n);
     push(q2, n);
+    printf("q2 push(%d)\n", n);
 
     destroy(q1);
+    printf("q1  num(%d) *\n", check_numItems(q1));
+    printf("q1  num(%d) destroyed\n", check_numItems(q1));
 
     while (!is_empty(q2))
-        printf("Popped %d from q2\n", pop(q2));
+        printf("q2  pop(%d)\n", pop(q2));
 
     push(q2, 3);
+    printf("q2 push(%d)\n", 3);
+
+    printf("q2  top(%d) check\n", check_top(q2));
+    printf("q2  bot(%d) check\n", check_bot(q2));
+
+    printf("q2  num(%d) *\n", check_numItems(q2));
     make_empty(q2);
+
     if (is_empty(q2))
-        printf("q2 is empty\n");
+        printf("q2  num(%d) emptied\n", check_numItems(q2));
     else
         printf("q2 is not empty\n");
 
     destroy(q2);
+    printf("q2  num(%d) destroyed\n", check_numItems(q2));
 
     return 0;
 }
