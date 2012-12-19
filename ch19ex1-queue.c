@@ -66,10 +66,16 @@ void push(Queue q, Item i) {
             terminate("Error in push: Could not increase Queue.");
 
         int j;
-        for (j = 0; j < q->top; j++)
-            q->queue[q->size + j] = q->queue[j];
-
-        q->bot = q->size + j;
+        if (q->top < q->size / 2) {
+            for (j = 0; j < q->top; j++)
+                q->queue[q->size + j] = q->queue[j];
+            q->bot = q->size + j;
+        }
+        else {
+            for (j = q->top; j < q->size * 2; j++)
+                q->queue[q->size + j] = q->queue[j];
+            q->top += q->size;
+        }
         q->size *= 2;
     } else
         q->bot %= q->size;
@@ -85,26 +91,25 @@ Item pop(Queue q) {
     if (is_empty(q))
         terminate("Error in pop: Queue is empty.");
 
-    if (q->num_items <= q->size / 2 - q->size / 8) {
-        int j, k;
+    if (q->num_items < q->size / 2 - q->size / 8) {
+        int j;
         q->size /= 2;
 
         if (q->bot > q->size) {
-            j = q->top >= q->size ? q->top : q->size;
-            for (k = 0; j < q->bot; j++)
-                q->queue[k++] = q->queue[j];
+            for (j = (q->top >= q->size) ? q->top : q->size; j < q->bot; j++)
+                q->queue[q->bot - j] = q->queue[j];
+
             q->top = q->top >= q->size ? 0 : q->top;
-            q->bot = k;
+            q->bot -= q->size;
         }
         else if (q->top >= q->size) {
-            for (j = k = q->size * 2 - q->top; j > 0; j--)
+            for (j = 0; j < q->size; j++)
                 q->queue[q->size - j] = q->queue[q->size * 2 - j];
-            q->top = q->size - k;
+            q->top -= q->size;
         }
         if ((q->queue = realloc(q->queue, (q->size) * sizeof(Item))) == NULL)
             terminate("Error in pop: Could not decrease Queue.");
     }
-
     i = q->queue[q->top++];
     q->top %= q->size;
     q->num_items--;

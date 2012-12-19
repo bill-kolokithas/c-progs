@@ -44,8 +44,8 @@ int main(void)
     push(q2, n);
     printf("q2 push(%d)\n", n);
 
-    destroy(q1);
     printf("q1  num(%d) *\n", check_numItems(q1));
+    destroy(q1);
     printf("q1  num(%d) destroyed\n", check_numItems(q1));
 
     while (!is_empty(q2))
@@ -53,6 +53,8 @@ int main(void)
 
     push(q2, 3);
     printf("q2 push(%d)\n", 3);
+    push(q2, 5);
+    printf("q2 push(%d)\n", 5);
 
     printf("q2  top(%d) check\n", check_top(q2));
     printf("q2  bot(%d) check\n", check_bot(q2));
