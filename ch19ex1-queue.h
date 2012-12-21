@@ -14,8 +14,9 @@ bool is_empty(Queue q);
 bool is_full(Queue q);
 void push(Queue q, Item i);
 Item pop(Queue q);
-Item check_top(Queue q);
-Item check_bot(Queue q);
+Item check_tail(Queue q);
+Item check_head(Queue q);
 int check_numItems(Queue q);
+void print_queue(Queue q);
 
 #endif

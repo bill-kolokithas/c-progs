@@ -11,6 +11,30 @@ int main(void)
     q1 = create();
     q2 = create();
 
+    for (i = 1; i <= 100; i++)
+        push(q1, i);
+
+    print_queue(q1);
+
+    for (i = 1; i <= 50; i++)
+        pop(q1);
+
+    print_queue(q1);
+
+    for (i = 1; i <= 25; i++)
+        push(q1, i);
+
+    print_queue(q1);
+
+    for (i = 1; i <= 40; i++)
+        pop(q1);
+
+    puts("");
+    print_queue(q1);
+    puts("");
+
+    make_empty(q1);
+
     for (i = 1; i <= 8; i++) {
         push(q1, i);
         printf("q1 push(%d)\n", i);
@@ -32,8 +56,8 @@ int main(void)
         printf("q1  pop(%d)\n", pop(q1));
 
     printf("q1  num(%d) *\n", check_numItems(q1));
-    printf("q1  top(%d) check\n", check_top(q1));
-    printf("q1  bot(%d) check\n", check_bot(q1));
+    printf("q1  top(%d) check\n", check_head(q1));
+    printf("q1  bot(%d) check\n", check_tail(q1));
 
     n = pop(q1);
     printf("q1  pop(%d)\n", n);
@@ -56,8 +80,8 @@ int main(void)
     push(q2, 5);
     printf("q2 push(%d)\n", 5);
 
-    printf("q2  top(%d) check\n", check_top(q2));
-    printf("q2  bot(%d) check\n", check_bot(q2));
+    printf("q2  top(%d) check\n", check_head(q2));
+    printf("q2  bot(%d) check\n", check_tail(q2));
 
     printf("q2  num(%d) *\n", check_numItems(q2));
     make_empty(q2);

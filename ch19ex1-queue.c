@@ -7,7 +7,7 @@
 
 struct queue_type {
     int *queue;
-    int num_items, bot, top, size;
+    int num_items, tail, head, size;
 };
 
 static void terminate(const char *message) {
@@ -46,7 +46,7 @@ void destroy(Queue q) {
 
 void make_empty(Queue q) {
 
-    q->num_items = q->bot = q->top = q->size = 0;
+    q->num_items = q->head = q->tail = 0;
 }
 
 bool is_empty(Queue q) {
@@ -66,21 +66,21 @@ void push(Queue q, Item i) {
             terminate("Error in push: Could not increase Queue.");
 
         int j;
-        if (q->top < q->size / 2) {
-            for (j = 0; j < q->top; j++)
+        if (q->head < q->size / 2) {
+            for (j = 0; j < q->head; j++)
                 q->queue[q->size + j] = q->queue[j];
-            q->bot = q->size + j;
+            q->tail = q->size + j;
         }
         else {
-            for (j = q->top; j < q->size * 2; j++)
+            for (j = q->head; j < q->size; j++)
                 q->queue[q->size + j] = q->queue[j];
-            q->top += q->size;
+            q->head += q->size;
         }
         q->size *= 2;
     } else
-        q->bot %= q->size;
+        q->tail %= q->size;
 
-    q->queue[q->bot++] = i;
+    q->queue[q->tail++] = i;
     q->num_items++;
 }
 
@@ -92,45 +92,62 @@ Item pop(Queue q) {
         terminate("Error in pop: Queue is empty.");
 
     if (q->num_items < q->size / 2 - q->size / 8) {
-        int j;
+        int j, k;
         q->size /= 2;
 
-        if (q->bot > q->size) {
-            for (j = (q->top >= q->size) ? q->top : q->size; j < q->bot; j++)
-                q->queue[q->bot - j] = q->queue[j];
+        if (q->tail > q->size) {
+            j = (q->head >= q->size) ? q->head : q->size;
+            for (k = 0; j < q->tail; j++, k++)
+                q->queue[k] = q->queue[j];
 
-            q->top = q->top >= q->size ? 0 : q->top;
-            q->bot -= q->size;
+            q->head = q->head >= q->size ? 0 : q->head;
+            q->tail = k;
         }
-        else if (q->top >= q->size) {
-            for (j = 0; j < q->size; j++)
-                q->queue[q->size - j] = q->queue[q->size * 2 - j];
-            q->top -= q->size;
+        else if (q->head >= q->size) {
+            q->head -= q->size;
+            for (j = q->head; j < q->size; j++)
+                q->queue[j] = q->queue[q->size + j];
         }
         if ((q->queue = realloc(q->queue, (q->size) * sizeof(Item))) == NULL)
             terminate("Error in pop: Could not decrease Queue.");
     }
-    i = q->queue[q->top++];
-    q->top %= q->size;
+    i = q->queue[q->head++];
+    q->head %= q->size;
     q->num_items--;
 
     return i;
 }
 
-Item check_top(Queue q) {
+void print_queue(Queue q) {
 
-    if (is_empty(q))
-        terminate("Queue is empty.");
+    int i = q->head % 10;
 
-    return q->queue[q->top];
+    while (i--)
+        printf("    ");
+
+    for (i = q->head; i < q->tail; i++) {
+        i %= q->size;
+        if (i % 10 == 0)
+            puts("");
+        printf("%4d", q->queue[i]);
+    }
+    puts("");
 }
 
-Item check_bot(Queue q) {
+Item check_head(Queue q) {
 
     if (is_empty(q))
         terminate("Queue is empty.");
 
-    return q->queue[mod(q->bot - 1, q->size)];
+    return q->queue[q->head];
+}
+
+Item check_tail(Queue q) {
+
+    if (is_empty(q))
+        terminate("Queue is empty.");
+
+    return q->queue[mod(q->tail - 1, q->size)];
 }
 
 int check_numItems(Queue q) {
