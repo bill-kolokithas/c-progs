@@ -1,0 +1,73 @@
+#include "binary-search-tree.h"
+
+#define ARRAY_SIZE(x) (int) (sizeof(x) / sizeof(x[0]))
+
+Bst root;
+char *words[] = { "lol", "re", "malaka", "rofl", "troll", "noob", "shit" };
+int indexes[] = { 5, 7, 2, 3, 1, 8, 6 };
+int i;
+
+void setup(void) {
+
+	root = bst_put(NULL, indexes[0], words[0]);
+	for (i = 1; i < ARRAY_SIZE(words); i++)
+		bst_put(root, indexes[i], words[i]);
+}
+
+void destroy(void) {
+
+	bst_destroy(root);
+}
+
+#test size
+
+	ck_assert_int_eq(bst_size(root), 7);
+
+#test size_range
+
+	ck_assert_int_eq(bst_size_range(root, 4, 7), 3);
+	ck_assert_int_eq(bst_size_range(root, 6, 9), 3);
+
+#test min
+
+	ck_assert_int_eq(bst_min(root), 1);
+
+#test max_bst
+
+	ck_assert_int_eq(bst_max(root), 8);
+
+#test empty
+
+	ck_assert_int_eq(bst_is_empty(root), 0);
+
+#test contains
+
+	ck_assert_int_eq(bst_contains(root, 0), 0);
+
+#test floor_bst
+
+	ck_assert_int_eq(bst_floor(root, 4), 3);
+
+#test ceiling
+
+	ck_assert_int_eq(bst_ceiling(root, 4), 5);
+
+#test rank
+
+	ck_assert_int_eq(bst_rank(root, 4), 3);
+
+#test select_bst
+
+	ck_assert_int_eq(bst_select(root, 4), 6);
+
+#test height
+
+	ck_assert_int_eq(bst_height(root), 2);
+
+#test order
+
+	for (i = 0; i < bst_size(root); i++)
+		ck_assert_str_eq(bst_get(root, indexes[i]), words[i]);
+
+#main-pre
+	tcase_add_unchecked_fixture(tc1_1, setup, destroy);

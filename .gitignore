@@ -1,1 +1,4 @@
-/bin
+**/bin
+**/test/*.c
+**/test-files/*
+*sublime*
