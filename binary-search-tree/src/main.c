@@ -8,7 +8,8 @@ int main(void) {
 
 	Bst root;
 	char value[MAXLEN];
-	int i, r, key, sum = 0;
+	int i, r, key;
+	long sum = 0;
 
 	scanf("%d %s", &key, value);
 	root = bst_put(NULL, key, value);
@@ -25,7 +26,7 @@ int main(void) {
 		sum += bst_floor(root, r);
 		sum += bst_size_range(root, r - (rand() % r), r);
 	}
-	printf("%d\n", sum);
+	printf("%ld\n", sum);
 	bst_print(root);
 
 	bst_destroy(root);

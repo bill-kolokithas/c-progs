@@ -19,6 +19,7 @@ int bst_ceiling(Bst root, int key);
 int bst_size_range(Bst root, int lo, int hi);
 int bst_rank(Bst root, int key);
 int bst_select(Bst root, int k);
+int bst_delete_min(Bst root);
 void bst_print(Bst root);
 void bst_print_keys(Bst root, int lo, int hi);
 void bst_destroy(Bst bst);

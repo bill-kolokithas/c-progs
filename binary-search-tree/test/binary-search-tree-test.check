@@ -64,7 +64,11 @@ void destroy(void) {
 
 	ck_assert_int_eq(bst_height(root), 2);
 
-#test order
+#test deletemin
+
+	ck_assert_int_eq(bst_delete_min(root), 1);
+
+#test print_inorder
 
 	for (i = 0; i < bst_size(root); i++)
 		ck_assert_str_eq(bst_get(root, indexes[i]), words[i]);

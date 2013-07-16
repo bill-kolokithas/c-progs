@@ -15,6 +15,7 @@ static Bst _bst_max(Bst node);
 static Bst _bst_select(Bst node, int key);
 static Bst _bst_floor(Bst node, int key);
 static Bst _bst_ceiling(Bst node, int key);
+Bst _bst_delete_min(Bst node);
 
 static Bst bst_new_node(int key, Value value) {
 
@@ -253,6 +254,26 @@ static Bst _bst_select(Bst node, int k) {
 		return _bst_select(node->left, k);
 	if (test < k)
 		return _bst_select(node->right, k - test - 1);
+
+	return node;
+}
+
+int bst_delete_min(Bst root) {
+
+	if (bst_is_empty(root))
+		return -1;
+
+	_bst_delete_min(root);
+	return 0;
+}
+
+Bst _bst_delete_min(Bst node) {
+
+	if (node->left == NULL)
+		return node->right;
+
+	node->left = _bst_delete_min(node->left);
+	node->size = 1 + bst_size(node->left) + bst_size(node->right);
 
 	return node;
 }
