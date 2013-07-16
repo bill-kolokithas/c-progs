@@ -3,6 +3,18 @@
 #include <string.h>
 #include "binary-search-tree.h"
 
+struct node {
+	int key, size;
+	char *value;
+	struct node *left, *right;
+};
+
+static int max(int a, int b);
+static Bst _bst_min(Bst node);
+static Bst _bst_max(Bst node);
+static Bst _bst_select(Bst node, int key);
+static Bst _bst_floor(Bst node, int key);
+static Bst _bst_ceiling(Bst node, int key);
 
 static Bst bst_new_node(int key, Value value) {
 
@@ -28,22 +40,6 @@ static Bst bst_new_node(int key, Value value) {
 	node->left = node->right = NULL;
 
 	return node;
-}
-
-Value bst_get(Bst root, int key) {
-
-	int cmp;
-
-	if (root == NULL)
-		return NULL;
-
-	cmp = key - root->key;
-	if (cmp < 0)
-		return bst_get(root->left, key);
-	if (cmp > 0)
-		return bst_get(root->right, key);
-
-	return root->value;
 }
 
 Bst bst_put(Bst root, int key, Value value) {
@@ -73,32 +69,95 @@ Bst bst_put(Bst root, int key, Value value) {
 	return root;
 }
 
-int bst_size_range(Bst root, int lo, int hi) {
+Value bst_get(Bst root, int key) {
 
-	if (lo > hi)
+	int cmp;
+
+	if (root == NULL)
+		return NULL;
+
+	cmp = key - root->key;
+	if (cmp < 0)
+		return bst_get(root->left, key);
+	if (cmp > 0)
+		return bst_get(root->right, key);
+
+	return root->value;
+}
+
+int bst_is_empty(Bst root) {
+
+	return bst_size(root) == 0;
+}
+
+int bst_size(Bst node) {
+
+	if (node == NULL)
 		return 0;
-	if (bst_contains(root, hi))
-		return 1 + bst_rank(root, hi) - bst_rank(root, lo);
 
-	return bst_rank(root, hi) - bst_rank(root, lo);
+	return node->size;
+}
+
+int bst_contains(Bst root, int key) {
+
+	return bst_get(root, key) != NULL;
 }
 
 int bst_height(Bst root) {
 
-	return root ? 1 + max(bst_height(root->left), bst_height(root->right)) : -1;
+	if (root == NULL)
+		return -1;
+
+	return 1 + max(bst_height(root->left), bst_height(root->right));
 }
 
-Bst _bst_min(Bst node) {
+static int max(int a, int b) {
 
-	return node->left == NULL ? node : _bst_min(node->left);
+	return a > b ? a : b;
 }
 
-Bst _bst_max(Bst node) {
+int bst_min(Bst root) {
 
-	return node->right == NULL ? node : _bst_max(node->right);
+	if (bst_is_empty(root))
+		return -1;
+
+	return _bst_min(root)->key;
 }
 
-Bst _bst_floor(Bst node, int key) {
+static Bst _bst_min(Bst node) {
+
+	if (node->left == NULL)
+		return node;
+
+	return _bst_min(node->left);
+}
+
+int bst_max(Bst root) {
+
+	if (bst_is_empty(root))
+		return -1;
+
+	return _bst_max(root)->key;
+}
+
+static Bst _bst_max(Bst node) {
+
+	if (node->right == NULL)
+		return node;
+
+	return _bst_max(node->right);
+}
+
+int bst_floor(Bst root, int key) {
+
+	Bst node = _bst_floor(root, key);
+	if (node == NULL)
+		return -1;
+
+	return node->key;
+}
+
+static Bst _bst_floor(Bst node, int key) {
 
 	int cmp;
 	Bst test;
@@ -119,7 +178,16 @@ Bst _bst_floor(Bst node, int key) {
 	return node;
 }
 
-Bst _bst_ceiling(Bst node, int key) {
+int bst_ceiling(Bst root, int key) {
+
+	Bst node = _bst_ceiling(root, key);
+	if (node == NULL)
+		return -1;
+
+	return node->key;
+}
+
+static Bst _bst_ceiling(Bst node, int key) {
 
 	int cmp;
 	Bst test;
@@ -139,20 +207,14 @@ Bst _bst_ceiling(Bst node, int key) {
 	return _bst_ceiling(node->right, key);
 }
 
-Bst _bst_select(Bst node, int k) {
+int bst_size_range(Bst root, int lo, int hi) {
 
-	int test;
+	if (lo > hi)
+		return 0;
+	if (bst_contains(root, hi))
+		return 1 + bst_rank(root, hi) - bst_rank(root, lo);
 
-	if (node == NULL)
-		return NULL;
-
-	test = bst_size(node->left);
-	if (test > k)
-		return _bst_select(node->left, k);
-	if (test < k)
-		return _bst_select(node->right, k - test - 1);
-
-	return node;
+	return bst_rank(root, hi) - bst_rank(root, lo);
 }
 
 int bst_rank(Bst root, int key) {
@@ -169,6 +231,30 @@ int bst_rank(Bst root, int key) {
 		return 1 + bst_size(root->left) + bst_rank(root->right, key);
 
 	return bst_size(root->left);
+}
+
+int bst_select(Bst root, int k) {
+
+	if (k < 0 || k >= bst_size(root))
+		return -1;
+
+	return _bst_select(root, k)->key;
+}
+
+static Bst _bst_select(Bst node, int k) {
+
+	int test;
+
+	if (node == NULL)
+		return NULL;
+
+	test = bst_size(node->left);
+	if (test > k)
+		return _bst_select(node->left, k);
+	if (test < k)
+		return _bst_select(node->right, k - test - 1);
+
+	return node;
 }
 
 void bst_print(Bst root) {
