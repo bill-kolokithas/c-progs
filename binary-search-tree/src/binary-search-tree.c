@@ -16,6 +16,7 @@ static Bst _bst_select(Bst node, int key);
 static Bst _bst_floor(Bst node, int key);
 static Bst _bst_ceiling(Bst node, int key);
 Bst _bst_delete_min(Bst node);
+Bst _bst_delete_max(Bst node);
 
 static Bst bst_new_node(int key, Value value) {
 
@@ -65,7 +66,6 @@ Bst bst_put(Bst root, int key, Value value) {
 		strncpy(root->value, value, len);
 		root->value[len] = '\0';
 	}
-
 	root->size = 1 + bst_size(root->left) + bst_size(root->right);
 	return root;
 }
@@ -80,7 +80,7 @@ Value bst_get(Bst root, int key) {
 	cmp = key - root->key;
 	if (cmp < 0)
 		return bst_get(root->left, key);
-	if (cmp > 0)
+	else if (cmp > 0)
 		return bst_get(root->right, key);
 
 	return root->value;
@@ -169,13 +169,13 @@ static Bst _bst_floor(Bst node, int key) {
 	cmp = key - node->key;
 	if (cmp == 0)
 		return node;
-	if (cmp < 0)
+	else if (cmp < 0)
 		return _bst_floor(node->left, key);
-
-	test = _bst_floor(node->right, key);
-	if (test != NULL)
-		return test;
-
+	else {
+		test = _bst_floor(node->right, key);
+		if (test != NULL)
+			return test;
+	}
 	return node;
 }
 
@@ -199,7 +199,7 @@ static Bst _bst_ceiling(Bst node, int key) {
 	cmp = key - node->key;
 	if (cmp == 0)
 		return node;
-	if (cmp < 0) {
+	else if (cmp < 0) {
 		test = _bst_ceiling(node->left, key);
 		if (test != NULL)
 			return test;
@@ -212,7 +212,7 @@ int bst_size_range(Bst root, int lo, int hi) {
 
 	if (lo > hi)
 		return 0;
-	if (bst_contains(root, hi))
+	else if (bst_contains(root, hi))
 		return 1 + bst_rank(root, hi) - bst_rank(root, lo);
 
 	return bst_rank(root, hi) - bst_rank(root, lo);
@@ -228,7 +228,7 @@ int bst_rank(Bst root, int key) {
 	cmp = key - root->key;
 	if (cmp < 0)
 		return bst_rank(root->left, key);
-	if (cmp > 0)
+	else if (cmp > 0)
 		return 1 + bst_size(root->left) + bst_rank(root->right, key);
 
 	return bst_size(root->left);
@@ -252,7 +252,7 @@ static Bst _bst_select(Bst node, int k) {
 	test = bst_size(node->left);
 	if (test > k)
 		return _bst_select(node->left, k);
-	if (test < k)
+	else if (test < k)
 		return _bst_select(node->right, k - test - 1);
 
 	return node;
@@ -263,8 +263,7 @@ int bst_delete_min(Bst root) {
 	if (bst_is_empty(root))
 		return -1;
 
-	_bst_delete_min(root);
-	return 0;
+	return _bst_delete_min(root)->key;
 }
 
 Bst _bst_delete_min(Bst node) {
@@ -275,6 +274,53 @@ Bst _bst_delete_min(Bst node) {
 	node->left = _bst_delete_min(node->left);
 	node->size = 1 + bst_size(node->left) + bst_size(node->right);
 
+	return node;
+}
+
+int bst_delete_max(Bst root) {
+
+	if (bst_is_empty(root))
+		return -1;
+
+	return _bst_delete_max(root)->key;
+}
+
+Bst _bst_delete_max(Bst node) {
+
+	if (node->right == NULL)
+		return node->left;
+
+	node->right = _bst_delete_max(node->right);
+	node->size = 1 + bst_size(node->left) + bst_size(node->right);
+
+	return node;
+}
+
+Bst bst_delete(Bst node, int key) {
+
+	Bst test;
+	int cmp;
+
+	if (node == NULL)
+		return NULL;
+
+	cmp = key - node->key;
+	if (cmp < 0)
+		node->left = bst_delete(node->left, key);
+	else if (cmp > 0)
+		node->right = bst_delete(node->right, key);
+	else {
+		if (node->right == NULL)
+			return node->left;
+		else if (node->left == NULL)
+			return node->right;
+
+		test = node;
+		node = _bst_min(test->right);
+		node->right = _bst_delete_min(test->right);
+		node->left = test->left;
+	}
+	node->size = 1 + bst_size(node->left) + bst_size(node->right);
 	return node;
 }
 

@@ -43,22 +43,29 @@ void destroy(void) {
 #test contains
 
 	ck_assert_int_eq(bst_contains(root, 0), 0);
+	ck_assert_int_ne(bst_contains(root, 2), 0);
 
 #test floor_bst
 
 	ck_assert_int_eq(bst_floor(root, 4), 3);
+	ck_assert_int_eq(bst_floor(root, 11), 8);
+	ck_assert_int_eq(bst_floor(root, 0), -1);
 
 #test ceiling
 
 	ck_assert_int_eq(bst_ceiling(root, 4), 5);
+	ck_assert_int_eq(bst_ceiling(root, 0), 1);
+	ck_assert_int_eq(bst_ceiling(root, 11), -1);
 
 #test rank
 
 	ck_assert_int_eq(bst_rank(root, 4), 3);
+	ck_assert_int_eq(bst_rank(root, 8), 6);
 
 #test select_bst
 
 	ck_assert_int_eq(bst_select(root, 4), 6);
+	ck_assert_int_eq(bst_select(root, 6), 8);
 
 #test height
 
@@ -66,7 +73,21 @@ void destroy(void) {
 
 #test deletemin
 
-	ck_assert_int_eq(bst_delete_min(root), 1);
+	ck_assert_ptr_ne(bst_get(root, 1), NULL);
+	bst_delete_min(root);
+	ck_assert_ptr_eq(bst_get(root, 1), NULL);
+
+#test deletemax
+
+	ck_assert_ptr_ne(bst_get(root, 8), NULL);
+	bst_delete_max(root);
+	ck_assert_ptr_eq(bst_get(root, 8), NULL);
+
+#test delete_key
+
+	ck_assert_ptr_ne(bst_get(root, 7), NULL);
+	bst_delete(root, 7);
+	ck_assert_ptr_eq(bst_get(root, 7), NULL);
 
 #test print_inorder
 
