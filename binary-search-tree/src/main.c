@@ -18,12 +18,12 @@ int main(void) {
 		bst_put(root, key, value);
 
 	srand(time(NULL));
-	for (i = 0; i < 1000000; i++) {
+	for (i = 0; i < 100000; i++) {
 		r = rand() % 1000000 + 1;
 		sum += bst_rank(root, r);
 		sum += bst_select(root, r);
 		sum += bst_floor(root, r);
-		sum += bst_floor(root, r);
+		sum += bst_ceiling(root, r);
 		sum += bst_size_range(root, r - (rand() % r), r);
 	}
 	printf("%ld\n", sum);

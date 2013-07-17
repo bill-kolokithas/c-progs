@@ -6,7 +6,7 @@
 typedef char *Value;
 typedef struct node *Bst;
 
-Bst bst_put(Bst root, int key, Value value);
+Bst bst_put(Bst root, int key, const Value value);
 Value bst_get(Bst root, int key);
 int bst_is_empty(Bst root);
 int bst_size(Bst node);

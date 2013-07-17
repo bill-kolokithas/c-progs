@@ -15,10 +15,10 @@ static Bst _bst_max(Bst node);
 static Bst _bst_select(Bst node, int key);
 static Bst _bst_floor(Bst node, int key);
 static Bst _bst_ceiling(Bst node, int key);
-Bst _bst_delete_min(Bst node);
-Bst _bst_delete_max(Bst node);
+static Bst _bst_delete_min(Bst node);
+static Bst _bst_delete_max(Bst node);
 
-static Bst bst_new_node(int key, Value value) {
+static Bst bst_new_node(int key, const Value value) {
 
 	int len;
 	Bst node;
@@ -44,7 +44,7 @@ static Bst bst_new_node(int key, Value value) {
 	return node;
 }
 
-Bst bst_put(Bst root, int key, Value value) {
+Bst bst_put(Bst root, int key, const Value value) {
 
 	int cmp, len;
 
@@ -266,7 +266,7 @@ int bst_delete_min(Bst root) {
 	return _bst_delete_min(root)->key;
 }
 
-Bst _bst_delete_min(Bst node) {
+static Bst _bst_delete_min(Bst node) {
 
 	if (node->left == NULL)
 		return node->right;
@@ -285,7 +285,7 @@ int bst_delete_max(Bst root) {
 	return _bst_delete_max(root)->key;
 }
 
-Bst _bst_delete_max(Bst node) {
+static Bst _bst_delete_max(Bst node) {
 
 	if (node->right == NULL)
 		return node->left;

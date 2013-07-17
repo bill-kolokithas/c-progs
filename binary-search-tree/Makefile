@@ -45,10 +45,6 @@ OBJFILES-TEST := $(filter-out %/main.o %.check, $(OBJFILES-TEST))
 $(OUTDIR)/$(PROGRAM): $(OBJFILES)
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
-# Build a lookup table to quickly match string commands -> function pointers
-$(SRCDIR)/gperf.c: $(INCLDIR)/gperf-input.txt
-	gperf $< >$@
-
 # Generic rule to build all source files needed for main
 $(OUTDIR)/%.o: $(SRCDIR)/%.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -I$(INCLDIR) -c $< -o $@
