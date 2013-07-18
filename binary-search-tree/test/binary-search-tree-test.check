@@ -1,6 +1,23 @@
+#include <stdbool.h>
 #include "binary-search-tree.h"
 
 #define ARRAY_SIZE(x) (int) (sizeof(x) / sizeof(x[0]))
+
+struct node {
+	int key, size;
+	char *value;
+	struct node *left, *right;
+};
+
+bool bst_size_consistent(Bst root) {
+
+	if (root == NULL)
+		return true;
+	if (root->size != bst_size(root->left) + bst_size(root->right) + 1)
+		return false;
+
+	return bst_size_consistent(root->left) && bst_size_consistent(root->right);
+}
 
 Bst root;
 char *words[] = { "lol", "re", "malaka", "rofl", "troll", "noob", "shit" };
@@ -74,25 +91,29 @@ void destroy(void) {
 #test deletemin
 
 	ck_assert_ptr_ne(bst_get(root, 1), NULL);
-	bst_delete_min(root);
+	root = bst_delete_min(root);
 	ck_assert_ptr_eq(bst_get(root, 1), NULL);
 
 #test deletemax
 
 	ck_assert_ptr_ne(bst_get(root, 8), NULL);
-	bst_delete_max(root);
+	root = bst_delete_max(root);
 	ck_assert_ptr_eq(bst_get(root, 8), NULL);
 
 #test delete_key
 
-	ck_assert_ptr_ne(bst_get(root, 7), NULL);
-	bst_delete(root, 7);
-	ck_assert_ptr_eq(bst_get(root, 7), NULL);
+	ck_assert_ptr_ne(bst_get(root, 5), NULL);
+	root = bst_delete(root, 5);
+	ck_assert_ptr_eq(bst_get(root, 5), NULL);
 
 #test print_inorder
 
 	for (i = 0; i < bst_size(root); i++)
 		ck_assert_str_eq(bst_get(root, indexes[i]), words[i]);
+
+#test size_consistent
+
+	ck_assert(bst_size_consistent(root));
 
 #main-pre
 	tcase_add_unchecked_fixture(tc1_1, setup, destroy);

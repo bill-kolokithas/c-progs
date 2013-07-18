@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "binary-search-tree.h"
 
 struct node {
@@ -15,8 +16,8 @@ static Bst _bst_max(Bst node);
 static Bst _bst_select(Bst node, int key);
 static Bst _bst_floor(Bst node, int key);
 static Bst _bst_ceiling(Bst node, int key);
-static Bst _bst_delete_min(Bst node);
-static Bst _bst_delete_max(Bst node);
+static Bst _bst_delete_min(Bst node, bool flag);
+static Bst _bst_delete_max(Bst node, bool flag);
 
 static Bst bst_new_node(int key, const Value value) {
 
@@ -161,7 +162,7 @@ int bst_floor(Bst root, int key) {
 static Bst _bst_floor(Bst node, int key) {
 
 	int cmp;
-	Bst test;
+	Bst temp;
 
 	if (node == NULL)
 		return NULL;
@@ -172,9 +173,9 @@ static Bst _bst_floor(Bst node, int key) {
 	else if (cmp < 0)
 		return _bst_floor(node->left, key);
 	else {
-		test = _bst_floor(node->right, key);
-		if (test != NULL)
-			return test;
+		temp = _bst_floor(node->right, key);
+		if (temp != NULL)
+			return temp;
 	}
 	return node;
 }
@@ -191,7 +192,7 @@ int bst_ceiling(Bst root, int key) {
 static Bst _bst_ceiling(Bst node, int key) {
 
 	int cmp;
-	Bst test;
+	Bst temp;
 
 	if (node == NULL)
 		return NULL;
@@ -200,9 +201,9 @@ static Bst _bst_ceiling(Bst node, int key) {
 	if (cmp == 0)
 		return node;
 	else if (cmp < 0) {
-		test = _bst_ceiling(node->left, key);
-		if (test != NULL)
-			return test;
+		temp = _bst_ceiling(node->left, key);
+		if (temp != NULL)
+			return temp;
 		return node;
 	}
 	return _bst_ceiling(node->right, key);
@@ -258,39 +259,53 @@ static Bst _bst_select(Bst node, int k) {
 	return node;
 }
 
-int bst_delete_min(Bst root) {
+Bst bst_delete_min(Bst root) {
 
 	if (bst_is_empty(root))
-		return -1;
+		return NULL;
 
-	return _bst_delete_min(root)->key;
+	return _bst_delete_min(root, true);
 }
 
-static Bst _bst_delete_min(Bst node) {
+static Bst _bst_delete_min(Bst node, bool flag) {
 
-	if (node->left == NULL)
-		return node->right;
+	Bst right;
 
-	node->left = _bst_delete_min(node->left);
+	if (node->left == NULL) {
+		right = node->right;
+		if (flag) {
+			free(node->value);
+			free(node);
+		}
+		return right;
+	}
+	node->left = _bst_delete_min(node->left, flag);
 	node->size = 1 + bst_size(node->left) + bst_size(node->right);
 
 	return node;
 }
 
-int bst_delete_max(Bst root) {
+Bst bst_delete_max(Bst root) {
 
 	if (bst_is_empty(root))
-		return -1;
+		return NULL;
 
-	return _bst_delete_max(root)->key;
+	return _bst_delete_max(root, true);
 }
 
-static Bst _bst_delete_max(Bst node) {
+static Bst _bst_delete_max(Bst node, bool flag) {
 
-	if (node->right == NULL)
-		return node->left;
+	Bst left;
 
-	node->right = _bst_delete_max(node->right);
+	if (node->right == NULL) {
+		left = node->left;
+		if (flag) {
+			free(node->value);
+			free(node);
+		}
+		return left;
+	}
+	node->right = _bst_delete_max(node->right, flag);
 	node->size = 1 + bst_size(node->left) + bst_size(node->right);
 
 	return node;
@@ -298,7 +313,7 @@ static Bst _bst_delete_max(Bst node) {
 
 Bst bst_delete(Bst node, int key) {
 
-	Bst test;
+	Bst temp;
 	int cmp;
 
 	if (node == NULL)
@@ -315,10 +330,12 @@ Bst bst_delete(Bst node, int key) {
 		else if (node->left == NULL)
 			return node->right;
 
-		test = node;
-		node = _bst_min(test->right);
-		node->right = _bst_delete_min(test->right);
-		node->left = test->left;
+		temp = node;
+		node = _bst_min(temp->right);
+		node->right = _bst_delete_min(temp->right, false);
+		node->left = temp->left;
+		free(temp->value);
+		free(temp);
 	}
 	node->size = 1 + bst_size(node->left) + bst_size(node->right);
 	return node;
@@ -354,11 +371,15 @@ void bst_print_keys(Bst root, int lo, int hi) {
 
 void bst_destroy(Bst root) {
 
+	Bst left, right;
+
 	if (root == NULL)
 		return;
 
+	left = root->left;
+	right = root->right;
 	free(root->value);
 	free(root);
-	bst_destroy(root->left);
-	bst_destroy(root->right);
+	bst_destroy(left);
+	bst_destroy(right);
 }
