@@ -18,9 +18,13 @@ struct node {
 #define rbt_isRed(node) (node == NULL ? false : node->color == RED)
 
 static int max(int a, int b);
+static void copy_value(char **src, const char *dest);
 static void rbt_flip_colors(RBTnode *node);
 static RBTnode *rbt_rotate_left(RBTnode *node);
 static RBTnode *rbt_rotate_right(RBTnode *node);
+static RBTnode *rbt_move_RED_left(RBTnode *node);
+static RBTnode *rbt_move_RED_right(RBTnode *node);
+static RBTnode *rbt_balance(RBTnode *node);
 static RBTnode *rbt_new_node(int key, const char *value);
 static RBTnode *_rbt_put(RBTnode *root, int key, const char *value);
 static RBTnode *_rbt_min(RBTnode *node);
@@ -28,14 +32,44 @@ static RBTnode *_rbt_max(RBTnode *node);
 static RBTnode *_rbt_select(RBTnode *node, int key);
 static RBTnode *_rbt_floor(RBTnode *node, int key);
 static RBTnode *_rbt_ceiling(RBTnode *node, int key);
-static RBTnode *_rbt_delete_min(RBTnode *node, bool flag);
-static RBTnode *_rbt_delete_max(RBTnode *node, bool flag);
+static RBTnode *_rbt_delete_min(RBTnode *node);
+static RBTnode *_rbt_delete_max(RBTnode *node);
 static RBTnode *_rbt_delete(RBTnode *node, int key);
 
 
+static int max(int a, int b) {
+
+	return a > b ? a : b;
+}
+
+static void copy_value(char **src, const char *dest) {
+
+	int len;
+
+	len = strlen(dest);
+	len = len > MAX_VALUE_LEN ? MAX_VALUE_LEN : len;
+
+	*src = realloc(*src, len + 1);
+	if (*src == NULL) {
+		fprintf(stderr, "Error in value copy");
+		exit(EXIT_FAILURE);
+	}
+	strncpy(*src, dest, len);
+	(*src)[len] = '\0';
+}
+
+static void rbt_flip_colors(RBTnode *node) {
+
+	node->color        = !node->color;
+	node->left->color  = !node->left->color;
+	node->right->color = !node->right->color;
+}
+
 static RBTnode *rbt_rotate_left(RBTnode *node) {
 
-	RBTnode *temp = node->right;
+	RBTnode *temp;
+
+	temp        = node->right;
 	node->right = temp->left;
 	temp->left  = node;
 	temp->color = node->color;
@@ -48,7 +82,9 @@ static RBTnode *rbt_rotate_left(RBTnode *node) {
 
 static RBTnode *rbt_rotate_right(RBTnode *node) {
 
-	RBTnode *temp = node->left;
+	RBTnode *temp;
+
+	temp        = node->left;
 	node->left  = temp->right;
 	temp->right = node;
 	temp->color = node->color;
@@ -59,16 +95,45 @@ static RBTnode *rbt_rotate_right(RBTnode *node) {
 	return temp;
 }
 
-static void rbt_flip_colors(RBTnode *node) {
+static RBTnode *rbt_move_RED_left(RBTnode *node) {
 
-	node->color        = !node->color;
-	node->left->color  = !node->left->color;
-	node->right->color = !node->right->color;
+	rbt_flip_colors(node);
+
+	if (rbt_isRed(node->right->left)) {
+		node->right = rbt_rotate_right(node->right);
+		node        = rbt_rotate_left(node);
+	}
+	return node;
+}
+
+static RBTnode *rbt_move_RED_right(RBTnode *node) {
+
+	rbt_flip_colors(node);
+
+	if (rbt_isRed(node->left->left))
+		node = rbt_rotate_right(node);
+
+	return node;
+}
+
+static RBTnode *rbt_balance(RBTnode *node) {
+
+	if (rbt_isRed(node->right))
+		node = rbt_rotate_left(node);
+
+	if (rbt_isRed(node->left) && rbt_isRed(node->left->left))
+		node = rbt_rotate_right(node);
+
+	if (rbt_isRed(node->left) && rbt_isRed(node->right))
+		rbt_flip_colors(node);
+
+	node->size = 1 + _rbt_size(node->left) + _rbt_size(node->right);
+
+	return node;
 }
 
 static RBTnode *rbt_new_node(int key, const char *value) {
 
-	int len;
 	RBTnode *node;
 
 	node = malloc(sizeof(struct node));
@@ -76,17 +141,12 @@ static RBTnode *rbt_new_node(int key, const char *value) {
 		fprintf(stderr, "Error in node creation");
 		exit(EXIT_FAILURE);
 	}
-	len = strlen(value);
-	node->value = malloc((len = len > MAX_VALUE_LEN ? MAX_VALUE_LEN : len) + 1);
-	if (node->value == NULL) {
-		fprintf(stderr, "Error in node creation");
-		exit(EXIT_FAILURE);
-	}
-	strncpy(node->value, value, len);
-	node->value[len] = '\0';
+	node->value = NULL;
+	copy_value(&node->value, value);
 	node->key   = key;
 	node->size  = 1;
-	node->left  = node->right = NULL;
+	node->left  = NULL;
+	node->right = NULL;
 	node->color = RED;
 
 	return node;
@@ -98,40 +158,33 @@ void rbt_put(RBTnode **root, int key, const char *value) {
 	(*root)->color = BLACK;
 }
 
-static RBTnode *_rbt_put(RBTnode *root, int key, const char *value) {
+static RBTnode *_rbt_put(RBTnode *node, int key, const char *value) {
 
-	int cmp, len;
+	int cmp;
 
-	if (root == NULL)
+	if (node == NULL)
 		return rbt_new_node(key, value);
 
-	cmp = key - root->key;
+	cmp = key - node->key;
 	if (cmp < 0)
-		root->left = _rbt_put(root->left, key, value);
+		node->left  = _rbt_put(node->left, key, value);
 	else if (cmp > 0)
-		root->right = _rbt_put(root->right, key, value);
-	else {
-		len = strlen(value);
-		root->value = realloc(root->value, (len = len > MAX_VALUE_LEN ? MAX_VALUE_LEN : len) + 1);
-		if (root->value == NULL) {
-			fprintf(stderr, "Error in put");
-			exit(EXIT_FAILURE);
-		}
-		strncpy(root->value, value, len);
-		root->value[len] = '\0';
-	}
-	if (rbt_isRed(root->right) && !rbt_isRed(root->left))
-		root = rbt_rotate_left(root);
+		node->right = _rbt_put(node->right, key, value);
+	else
+		copy_value(&node->value, value);
 
-	if (rbt_isRed(root->left) && rbt_isRed(root->left->left))
-		root = rbt_rotate_right(root);
+	if (rbt_isRed(node->right) && !rbt_isRed(node->left))
+		node = rbt_rotate_left(node);
 
-	if (rbt_isRed(root->left) && rbt_isRed(root->right))
-		rbt_flip_colors(root);
+	if (rbt_isRed(node->left) && rbt_isRed(node->left->left))
+		node = rbt_rotate_right(node);
 
-	root->size = 1 + _rbt_size(root->left) + _rbt_size(root->right);
+	if (rbt_isRed(node->left) && rbt_isRed(node->right))
+		rbt_flip_colors(node);
 
-	return root;
+	node->size = 1 + _rbt_size(node->left) + _rbt_size(node->right);
+
+	return node;
 }
 
 char *rbt_get(RBTnode *root, int key) {
@@ -174,11 +227,6 @@ int rbt_height(RBTnode *root) {
 		return -1;
 
 	return 1 + max(rbt_height(root->left), rbt_height(root->right));
-}
-
-static int max(int a, int b) {
-
-	return a > b ? a : b;
 }
 
 int rbt_min(RBTnode *root) {
@@ -325,89 +373,111 @@ static RBTnode *_rbt_select(RBTnode *node, int k) {
 void rbt_delete_min(RBTnode **root) {
 
 	if (rbt_isEmpty(*root))
-		*root = NULL;
+		return;
 
-	*root = _rbt_delete_min(*root, true);
+	if (!rbt_isRed((*root)->left) && !rbt_isRed((*root)->right))
+		(*root)->color = RED;
+
+	*root = _rbt_delete_min(*root);
+
+	if (!rbt_isEmpty(*root))
+		(*root)->color = BLACK;
 }
 
-static RBTnode *_rbt_delete_min(RBTnode *node, bool flag) {
-
-	RBTnode *right;
+static RBTnode *_rbt_delete_min(RBTnode *node) {
 
 	if (node->left == NULL) {
-		right = node->right;
-		if (flag) {
-			free(node->value);
-			free(node);
-		}
-		return right;
+		free(node->value);
+		free(node);
+		return NULL;
 	}
-	node->left = _rbt_delete_min(node->left, flag);
-	node->size = 1 + _rbt_size(node->left) + _rbt_size(node->right);
+	if (!rbt_isRed(node->left) && !rbt_isRed(node->left->left))
+		node = rbt_move_RED_left(node);
 
-	return node;
+	node->left = _rbt_delete_min(node->left);
+
+	return rbt_balance(node);
 }
 
 void rbt_delete_max(RBTnode **root) {
 
 	if (rbt_isEmpty(*root))
-		*root = NULL;
+		return;
 
-	*root = _rbt_delete_max(*root, true);
+	if (!rbt_isRed((*root)->left) && !rbt_isRed((*root)->right))
+		(*root)->color = RED;
+
+	*root = _rbt_delete_max(*root);
+
+	if (!rbt_isEmpty(*root))
+		(*root)->color = BLACK;
 }
 
-static RBTnode *_rbt_delete_max(RBTnode *node, bool flag) {
+static RBTnode *_rbt_delete_max(RBTnode *node) {
 
-	RBTnode *left;
+	if (rbt_isRed(node->left))
+		node = rbt_rotate_right(node);
 
 	if (node->right == NULL) {
-		left = node->left;
-		if (flag) {
-			free(node->value);
-			free(node);
-		}
-		return left;
+		free(node->value);
+		free(node);
+		return NULL;
 	}
-	node->right = _rbt_delete_max(node->right, flag);
-	node->size = 1 + _rbt_size(node->left) + _rbt_size(node->right);
+	if (!rbt_isRed(node->right) && !rbt_isRed(node->right->left))
+		node = rbt_move_RED_right(node);
 
-	return node;
+	node->right = _rbt_delete_max(node->right);
+
+	return rbt_balance(node);
 }
 
 void rbt_delete(RBTnode **root, int key) {
 
+	if (!rbt_contains(*root, key))
+		return;
+
+	if (!rbt_isRed((*root)->left) && !rbt_isRed((*root)->right))
+		(*root)->color = RED;
+
 	*root = _rbt_delete(*root, key);
+
+	if (!rbt_isEmpty(*root))
+		(*root)->color = BLACK;
 }
 
 static RBTnode *_rbt_delete(RBTnode *node, int key) {
 
-	RBTnode *temp;
 	int cmp;
-
-	if (node == NULL)
-		return NULL;
+	char *value;
 
 	cmp = key - node->key;
-	if (cmp < 0)
+	if (cmp < 0) {
+		if (!rbt_isRed(node->left) && !rbt_isRed(node->left->left))
+			node = rbt_move_RED_left(node);
+
 		node->left = _rbt_delete(node->left, key);
-	else if (cmp > 0)
-		node->right = _rbt_delete(node->right, key);
-	else {
-		if (node->right == NULL)
-			return node->left;
-		else if (node->left == NULL)
-			return node->right;
-
-		temp = node;
-		node = _rbt_min(temp->right);
-		node->right = _rbt_delete_min(temp->right, false);
-		node->left = temp->left;
-		free(temp->value);
-		free(temp);
 	}
-	node->size = 1 + _rbt_size(node->left) + _rbt_size(node->right);
+	else {
+		if (rbt_isRed(node->left))
+			node = rbt_rotate_right(node);
 
-	return node;
+		if (cmp == 0 && node->right == NULL) {
+			free(node->value);
+			free(node);
+			return NULL;
+		}
+		if (!rbt_isRed(node->right) && !rbt_isRed(node->right->left))
+			node = rbt_move_RED_right(node);
+
+		if (cmp == 0) {
+			node->key = _rbt_min(node->right)->key;
+			value = rbt_get(node->right, node->key);
+			copy_value(&node->value, value);
+			node->right = _rbt_delete_min(node->right);
+		} else
+			node->right = _rbt_delete(node->right, key);
+	}
+	return rbt_balance(node);
 }
 
 void rbt_print(RBTnode *root) {
@@ -445,7 +515,7 @@ void rbt_destroy(RBTnode *root) {
 	if (root == NULL)
 		return;
 
-	left = root->left;
+	left  = root->left;
 	right = root->right;
 	free(root->value);
 	free(root);

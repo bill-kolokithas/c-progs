@@ -14,7 +14,7 @@ struct node {
 
 static int max(int a, int b);
 static BSTnode *bst_new_node(int key, const char *value);
-static BSTnode *_bst_put(BSTnode *root, int key, const char *value);
+static BSTnode *_bst_put(BSTnode *node, int key, const char *value);
 static BSTnode *_bst_min(BSTnode *node);
 static BSTnode *_bst_max(BSTnode *node);
 static BSTnode *_bst_select(BSTnode *node, int key);
@@ -23,6 +23,12 @@ static BSTnode *_bst_ceiling(BSTnode *node, int key);
 static BSTnode *_bst_delete_min(BSTnode *node, bool flag);
 static BSTnode *_bst_delete_max(BSTnode *node, bool flag);
 static BSTnode *_bst_delete(BSTnode *node, int key);
+
+
+static int max(int a, int b) {
+
+	return a > b ? a : b;
+}
 
 static BSTnode *bst_new_node(int key, const char *value) {
 
@@ -54,31 +60,31 @@ void bst_put(BSTnode **root, int key, const char *value) {
 	*root = _bst_put(*root, key, value);
 }
 
-static BSTnode *_bst_put(BSTnode *root, int key, const char *value) {
+static BSTnode *_bst_put(BSTnode *node, int key, const char *value) {
 
 	int cmp, len;
 
-	if (root == NULL)
+	if (node == NULL)
 		return bst_new_node(key, value);
 
-	cmp = key - root->key;
+	cmp = key - node->key;
 	if (cmp < 0)
-		root->left = _bst_put(root->left, key, value);
+		node->left = _bst_put(node->left, key, value);
 	else if (cmp > 0)
-		root->right = _bst_put(root->right, key, value);
+		node->right = _bst_put(node->right, key, value);
 	else {
 		len = strlen(value);
-		root->value = realloc(root->value, (len = len > MAX_VALUE_LEN ? MAX_VALUE_LEN : len) + 1);
-		if (root->value == NULL) {
+		node->value = realloc(node->value, (len = len > MAX_VALUE_LEN ? MAX_VALUE_LEN : len) + 1);
+		if (node->value == NULL) {
 			fprintf(stderr, "Error in put");
 			exit(EXIT_FAILURE);
 		}
-		strncpy(root->value, value, len);
-		root->value[len] = '\0';
+		strncpy(node->value, value, len);
+		node->value[len] = '\0';
 	}
-	root->size = 1 + _bst_size(root->left) + _bst_size(root->right);
+	node->size = 1 + _bst_size(node->left) + _bst_size(node->right);
 
-	return root;
+	return node;
 }
 
 char *bst_get(BSTnode *root, int key) {
@@ -121,11 +127,6 @@ int bst_height(BSTnode *root) {
 		return -1;
 
 	return 1 + max(bst_height(root->left), bst_height(root->right));
-}
-
-static int max(int a, int b) {
-
-	return a > b ? a : b;
 }
 
 int bst_min(BSTnode *root) {
@@ -272,7 +273,7 @@ static BSTnode *_bst_select(BSTnode *node, int k) {
 void bst_delete_min(BSTnode **root) {
 
 	if (bst_is_empty(*root))
-		*root = NULL;
+		return;
 
 	*root = _bst_delete_min(*root, true);
 }
@@ -298,7 +299,7 @@ static BSTnode *_bst_delete_min(BSTnode *node, bool flag) {
 void bst_delete_max(BSTnode **root) {
 
 	if (bst_is_empty(*root))
-		*root = NULL;
+		return;
 
 	*root = _bst_delete_max(*root, true);
 }
@@ -322,6 +323,9 @@ static BSTnode *_bst_delete_max(BSTnode *node, bool flag) {
 }
 
 void bst_delete(BSTnode **root, int key) {
+
+	if (!bst_contains(*root, key))
+		return;
 
 	*root = _bst_delete(*root, key);
 }
@@ -348,7 +352,7 @@ static BSTnode *_bst_delete(BSTnode *node, int key) {
 		temp = node;
 		node = _bst_min(temp->right);
 		node->right = _bst_delete_min(temp->right, false);
-		node->left = temp->left;
+		node->left  = temp->left;
 		free(temp->value);
 		free(temp);
 	}
