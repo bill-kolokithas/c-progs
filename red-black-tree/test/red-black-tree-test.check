@@ -1,5 +1,5 @@
 #include <stdbool.h>
-#include "binary-search-tree.h"
+#include "red-black-tree.h"
 
 #define ARRAY_SIZE(x) (int) (sizeof(x) / sizeof(x[0]))
 #define RED true

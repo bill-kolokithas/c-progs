@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "binary-search-tree.h"
+#include "red-black-tree.h"
 
 #define RED true
 #define BLACK false

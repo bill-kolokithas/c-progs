@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "binary-search-tree.h"
+#include "red-black-tree.h"
 
 
 int main(void) {
