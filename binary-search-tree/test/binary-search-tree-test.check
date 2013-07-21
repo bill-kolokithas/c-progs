@@ -9,7 +9,7 @@ struct node {
 	struct node *left, *right;
 };
 
-bool bst_size_consistent(Bst root) {
+bool bst_size_consistent(BStree root) {
 
 	if (root == NULL)
 		return true;
@@ -19,7 +19,7 @@ bool bst_size_consistent(Bst root) {
 	return bst_size_consistent(root->left) && bst_size_consistent(root->right);
 }
 
-Bst root;
+BStree root;
 char *words[] = { "lol", "re", "malaka", "rofl", "troll", "noob", "shit" };
 int indexes[] = { 5, 7, 2, 3, 1, 8, 6 };
 int i;

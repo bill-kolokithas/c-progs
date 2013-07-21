@@ -11,18 +11,18 @@ struct node {
 };
 
 static int max(int a, int b);
-static Bst _bst_min(Bst node);
-static Bst _bst_max(Bst node);
-static Bst _bst_select(Bst node, int key);
-static Bst _bst_floor(Bst node, int key);
-static Bst _bst_ceiling(Bst node, int key);
-static Bst _bst_delete_min(Bst node, bool flag);
-static Bst _bst_delete_max(Bst node, bool flag);
+static BStree _bst_min(BStree node);
+static BStree _bst_max(BStree node);
+static BStree _bst_select(BStree node, int key);
+static BStree _bst_floor(BStree node, int key);
+static BStree _bst_ceiling(BStree node, int key);
+static BStree _bst_delete_min(BStree node, bool flag);
+static BStree _bst_delete_max(BStree node, bool flag);
 
-static Bst bst_new_node(int key, const Value value) {
+static BStree bst_new_node(int key, const Value value) {
 
 	int len;
-	Bst node;
+	BStree node;
 
 	node = malloc(sizeof(struct node));
 	if (node == NULL) {
@@ -30,7 +30,7 @@ static Bst bst_new_node(int key, const Value value) {
 		exit(EXIT_FAILURE);
 	}
 	len = strlen(value);
-	node->value = malloc((len = len > MAXLEN ? MAXLEN : len) + 1);
+	node->value = malloc((len = len > MAX_VALUE_LEN ? MAX_VALUE_LEN : len) + 1);
 	if (node->value == NULL) {
 		fprintf(stderr, "Error in node creation");
 		exit(EXIT_FAILURE);
@@ -45,7 +45,7 @@ static Bst bst_new_node(int key, const Value value) {
 	return node;
 }
 
-Bst bst_put(Bst root, int key, const Value value) {
+BStree bst_put(BStree root, int key, const Value value) {
 
 	int cmp, len;
 
@@ -59,7 +59,7 @@ Bst bst_put(Bst root, int key, const Value value) {
 		root->right = bst_put(root->right, key, value);
 	else {
 		len = strlen(value);
-		root->value = realloc(root->value, (len = len > MAXLEN ? MAXLEN : len) + 1);
+		root->value = realloc(root->value, (len = len > MAX_VALUE_LEN ? MAX_VALUE_LEN : len) + 1);
 		if (root->value == NULL) {
 			fprintf(stderr, "Error in put");
 			exit(EXIT_FAILURE);
@@ -71,7 +71,7 @@ Bst bst_put(Bst root, int key, const Value value) {
 	return root;
 }
 
-Value bst_get(Bst root, int key) {
+Value bst_get(BStree root, int key) {
 
 	int cmp;
 
@@ -87,12 +87,12 @@ Value bst_get(Bst root, int key) {
 	return root->value;
 }
 
-int bst_is_empty(Bst root) {
+int bst_is_empty(BStree root) {
 
 	return bst_size(root) == 0;
 }
 
-int bst_size(Bst node) {
+int bst_size(BStree node) {
 
 	if (node == NULL)
 		return 0;
@@ -100,12 +100,12 @@ int bst_size(Bst node) {
 	return node->size;
 }
 
-int bst_contains(Bst root, int key) {
+int bst_contains(BStree root, int key) {
 
 	return bst_get(root, key) != NULL;
 }
 
-int bst_height(Bst root) {
+int bst_height(BStree root) {
 
 	if (root == NULL)
 		return -1;
@@ -118,7 +118,7 @@ static int max(int a, int b) {
 	return a > b ? a : b;
 }
 
-int bst_min(Bst root) {
+int bst_min(BStree root) {
 
 	if (bst_is_empty(root))
 		return -1;
@@ -126,7 +126,7 @@ int bst_min(Bst root) {
 	return _bst_min(root)->key;
 }
 
-static Bst _bst_min(Bst node) {
+static BStree _bst_min(BStree node) {
 
 	if (node->left == NULL)
 		return node;
@@ -134,7 +134,7 @@ static Bst _bst_min(Bst node) {
 	return _bst_min(node->left);
 }
 
-int bst_max(Bst root) {
+int bst_max(BStree root) {
 
 	if (bst_is_empty(root))
 		return -1;
@@ -142,7 +142,7 @@ int bst_max(Bst root) {
 	return _bst_max(root)->key;
 }
 
-static Bst _bst_max(Bst node) {
+static BStree _bst_max(BStree node) {
 
 	if (node->right == NULL)
 		return node;
@@ -150,19 +150,19 @@ static Bst _bst_max(Bst node) {
 	return _bst_max(node->right);
 }
 
-int bst_floor(Bst root, int key) {
+int bst_floor(BStree root, int key) {
 
-	Bst node = _bst_floor(root, key);
+	BStree node = _bst_floor(root, key);
 	if (node == NULL)
 		return -1;
 
 	return node->key;
 }
 
-static Bst _bst_floor(Bst node, int key) {
+static BStree _bst_floor(BStree node, int key) {
 
 	int cmp;
-	Bst temp;
+	BStree temp;
 
 	if (node == NULL)
 		return NULL;
@@ -180,19 +180,19 @@ static Bst _bst_floor(Bst node, int key) {
 	return node;
 }
 
-int bst_ceiling(Bst root, int key) {
+int bst_ceiling(BStree root, int key) {
 
-	Bst node = _bst_ceiling(root, key);
+	BStree node = _bst_ceiling(root, key);
 	if (node == NULL)
 		return -1;
 
 	return node->key;
 }
 
-static Bst _bst_ceiling(Bst node, int key) {
+static BStree _bst_ceiling(BStree node, int key) {
 
 	int cmp;
-	Bst temp;
+	BStree temp;
 
 	if (node == NULL)
 		return NULL;
@@ -209,7 +209,7 @@ static Bst _bst_ceiling(Bst node, int key) {
 	return _bst_ceiling(node->right, key);
 }
 
-int bst_size_range(Bst root, int lo, int hi) {
+int bst_size_range(BStree root, int lo, int hi) {
 
 	if (lo > hi)
 		return 0;
@@ -219,7 +219,7 @@ int bst_size_range(Bst root, int lo, int hi) {
 	return bst_rank(root, hi) - bst_rank(root, lo);
 }
 
-int bst_rank(Bst root, int key) {
+int bst_rank(BStree root, int key) {
 
 	int cmp;
 
@@ -235,7 +235,7 @@ int bst_rank(Bst root, int key) {
 	return bst_size(root->left);
 }
 
-int bst_select(Bst root, int k) {
+int bst_select(BStree root, int k) {
 
 	if (k < 0 || k >= bst_size(root))
 		return -1;
@@ -243,7 +243,7 @@ int bst_select(Bst root, int k) {
 	return _bst_select(root, k)->key;
 }
 
-static Bst _bst_select(Bst node, int k) {
+static BStree _bst_select(BStree node, int k) {
 
 	int test;
 
@@ -259,7 +259,7 @@ static Bst _bst_select(Bst node, int k) {
 	return node;
 }
 
-Bst bst_delete_min(Bst root) {
+BStree bst_delete_min(BStree root) {
 
 	if (bst_is_empty(root))
 		return NULL;
@@ -267,9 +267,9 @@ Bst bst_delete_min(Bst root) {
 	return _bst_delete_min(root, true);
 }
 
-static Bst _bst_delete_min(Bst node, bool flag) {
+static BStree _bst_delete_min(BStree node, bool flag) {
 
-	Bst right;
+	BStree right;
 
 	if (node->left == NULL) {
 		right = node->right;
@@ -285,7 +285,7 @@ static Bst _bst_delete_min(Bst node, bool flag) {
 	return node;
 }
 
-Bst bst_delete_max(Bst root) {
+BStree bst_delete_max(BStree root) {
 
 	if (bst_is_empty(root))
 		return NULL;
@@ -293,9 +293,9 @@ Bst bst_delete_max(Bst root) {
 	return _bst_delete_max(root, true);
 }
 
-static Bst _bst_delete_max(Bst node, bool flag) {
+static BStree _bst_delete_max(BStree node, bool flag) {
 
-	Bst left;
+	BStree left;
 
 	if (node->right == NULL) {
 		left = node->left;
@@ -311,9 +311,9 @@ static Bst _bst_delete_max(Bst node, bool flag) {
 	return node;
 }
 
-Bst bst_delete(Bst node, int key) {
+BStree bst_delete(BStree node, int key) {
 
-	Bst temp;
+	BStree temp;
 	int cmp;
 
 	if (node == NULL)
@@ -341,7 +341,7 @@ Bst bst_delete(Bst node, int key) {
 	return node;
 }
 
-void bst_print(Bst root) {
+void bst_print(BStree root) {
 
 	if (root == NULL)
 		return;
@@ -351,7 +351,7 @@ void bst_print(Bst root) {
 	bst_print(root->right);
 }
 
-void bst_print_keys(Bst root, int lo, int hi) {
+void bst_print_keys(BStree root, int lo, int hi) {
 
 	int cmp_lo, cmp_hi;
 
@@ -369,9 +369,9 @@ void bst_print_keys(Bst root, int lo, int hi) {
 		bst_print_keys(root->right, lo, hi);
 }
 
-void bst_destroy(Bst root) {
+void bst_destroy(BStree root) {
 
-	Bst left, right;
+	BStree left, right;
 
 	if (root == NULL)
 		return;

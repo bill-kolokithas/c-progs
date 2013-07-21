@@ -6,8 +6,8 @@
 
 int main(void) {
 
-	Bst root;
-	char value[MAXLEN];
+	BStree root;
+	char value[MAX_VALUE_LEN];
 	int i, r, key;
 	long sum = 0;
 
