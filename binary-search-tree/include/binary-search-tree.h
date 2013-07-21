@@ -1,29 +1,30 @@
 #ifndef BINARY_SEARCH_TREE_H
 #define BINARY_SEARCH_TREE_H
 
+#include <stdbool.h>
+
 #define MAX_VALUE_LEN 80
 
-typedef char *Value;
-typedef struct node *BStree;
+typedef struct node BSTnode;
 
-BStree bst_put(BStree root, int key, const Value value);
-Value bst_get(BStree root, int key);
-int bst_is_empty(BStree root);
-int bst_size(BStree node);
-int bst_contains(BStree root, int key);
-int bst_height(BStree root);
-int bst_min(BStree root);
-int bst_max(BStree root);
-int bst_floor(BStree root, int key);
-int bst_ceiling(BStree root, int key);
-int bst_size_range(BStree root, int lo, int hi);
-int bst_rank(BStree root, int key);
-int bst_select(BStree root, int k);
-BStree bst_delete_min(BStree root);
-BStree bst_delete_max(BStree root);
-BStree bst_delete(BStree node, int key);
-void bst_print(BStree root);
-void bst_print_keys(BStree root, int lo, int hi);
-void bst_destroy(BStree bst);
+char *bst_get(BSTnode *root, int key);
+void bst_put(BSTnode **root, int key, const char *value);
+bool bst_is_empty(BSTnode *root);
+bool bst_contains(BSTnode *root, int key);
+int bst_size(BSTnode *node);
+int bst_height(BSTnode *root);
+int bst_min(BSTnode *root);
+int bst_max(BSTnode *root);
+int bst_floor(BSTnode *root, int key);
+int bst_ceiling(BSTnode *root, int key);
+int bst_size_range(BSTnode *root, int lo, int hi);
+int bst_rank(BSTnode *root, int key);
+int bst_select(BSTnode *root, int k);
+void bst_delete_min(BSTnode **root);
+void bst_delete_max(BSTnode **root);
+void bst_delete(BSTnode **node, int key);
+void bst_print(BSTnode *root);
+void bst_print_keys(BSTnode *root, int lo, int hi);
+void bst_destroy(BSTnode *bst);
 
 #endif

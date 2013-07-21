@@ -6,29 +6,24 @@
 
 int main(void) {
 
-	BStree root;
+	BSTnode *root = NULL;
 	char value[MAX_VALUE_LEN];
 	int i, r, key;
-	long sum = 0;
-
-	scanf("%d %s", &key, value);
-	root = bst_put(NULL, key, value);
 
 	while (scanf("%d %s", &key, value) == 2)
-		bst_put(root, key, value);
+		bst_put(&root, key, value);
 
 	srand(time(NULL));
 	for (i = 0; i < 100000; i++) {
-		r = rand() % 1000000 + 1;
-		sum += bst_rank(root, r);
-		sum += bst_select(root, r);
-		sum += bst_floor(root, r);
-		sum += bst_ceiling(root, r);
-		sum += bst_size_range(root, r - (rand() % r), r);
+		r = rand() % bst_size(root) + 1;
+		bst_rank(root, r);
+		bst_select(root, r);
+		bst_floor(root, r);
+		bst_ceiling(root, r);
+		bst_size_range(root, r - (rand() % r), r);
 	}
-	printf("%ld\n", sum);
 	bst_print(root);
-
 	bst_destroy(root);
+
 	return 0;
 }

@@ -9,7 +9,7 @@ struct node {
 	struct node *left, *right;
 };
 
-bool bst_size_consistent(BStree root) {
+bool bst_size_consistent(BSTnode *root) {
 
 	if (root == NULL)
 		return true;
@@ -19,16 +19,15 @@ bool bst_size_consistent(BStree root) {
 	return bst_size_consistent(root->left) && bst_size_consistent(root->right);
 }
 
-BStree root;
+BSTnode *root;
 char *words[] = { "lol", "re", "malaka", "rofl", "troll", "noob", "shit" };
 int indexes[] = { 5, 7, 2, 3, 1, 8, 6 };
 int i;
 
 void setup(void) {
 
-	root = bst_put(NULL, indexes[0], words[0]);
-	for (i = 1; i < ARRAY_SIZE(words); i++)
-		bst_put(root, indexes[i], words[i]);
+	for (i = 0; i < ARRAY_SIZE(words); i++)
+		bst_put(&root, indexes[i], words[i]);
 }
 
 void destroy(void) {
@@ -91,19 +90,19 @@ void destroy(void) {
 #test deletemin
 
 	ck_assert_ptr_ne(bst_get(root, 1), NULL);
-	root = bst_delete_min(root);
+	bst_delete_min(&root);
 	ck_assert_ptr_eq(bst_get(root, 1), NULL);
 
 #test deletemax
 
 	ck_assert_ptr_ne(bst_get(root, 8), NULL);
-	root = bst_delete_max(root);
+	bst_delete_max(&root);
 	ck_assert_ptr_eq(bst_get(root, 8), NULL);
 
 #test delete_key
 
 	ck_assert_ptr_ne(bst_get(root, 5), NULL);
-	root = bst_delete(root, 5);
+	bst_delete(&root, 5);
 	ck_assert_ptr_eq(bst_get(root, 5), NULL);
 
 #test print_inorder

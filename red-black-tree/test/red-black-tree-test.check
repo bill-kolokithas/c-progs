@@ -12,7 +12,7 @@ struct node {
 	bool color;
 };
 
-RBnode *root = NULL;
+RBTnode *root = NULL;
 char *words[] = { "lol", "re", "malaka", "rofl", "troll", "noob", "shit" };
 int indexes[] = { 5, 7, 2, 3, 1, 8, 6 };
 int i;
@@ -28,7 +28,7 @@ void destroy(void) {
 	rbt_destroy(root);
 }
 
-bool rbt_size_consistent(RBnode *root) {
+bool rbt_size_consistent(RBTnode *root) {
 
 	if (root == NULL)
 		return true;
@@ -38,7 +38,7 @@ bool rbt_size_consistent(RBnode *root) {
 	return rbt_size_consistent(root->left) && rbt_size_consistent(root->right);
 }
 
-static bool rbt_isRed(RBnode *node) {
+static bool rbt_isRed(RBTnode *node) {
 
 	if (node == NULL)
 		return false;
@@ -46,7 +46,7 @@ static bool rbt_isRed(RBnode *node) {
 	return node->color == RED;
 }
 
-bool rbt_is23(RBnode *root, RBnode *node) {
+bool rbt_is23(RBTnode *root, RBTnode *node) {
 
 	if (node == NULL)
 		return true;
@@ -60,10 +60,10 @@ bool rbt_is23(RBnode *root, RBnode *node) {
 	return rbt_is23(root, node->left) && rbt_is23(root, node->right);
 }
 
-bool _rbt_isBalanced(RBnode *root, int black);
-bool rbt_isBalanced(RBnode *root) {
+bool _rbt_isBalanced(RBTnode *root, int black);
+bool rbt_isBalanced(RBTnode *root) {
 
-	RBnode *node = root;
+	RBTnode *node = root;
 	int black = 0;
 
 	while (node != NULL) {
@@ -74,7 +74,7 @@ bool rbt_isBalanced(RBnode *root) {
 	return _rbt_isBalanced(root, black);
 }
 
-bool _rbt_isBalanced(RBnode *node, int black) {
+bool _rbt_isBalanced(RBTnode *node, int black) {
 
 	if (node == NULL)
 		return black == 0;

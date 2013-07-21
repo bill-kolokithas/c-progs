@@ -18,24 +18,24 @@ struct node {
 #define rbt_isRed(node) (node == NULL ? false : node->color == RED)
 
 static int max(int a, int b);
-static void rbt_flip_colors(RBnode *node);
-static RBnode *rbt_rotate_left(RBnode *node);
-static RBnode *rbt_rotate_right(RBnode *node);
-static RBnode *rbt_new_node(int key, const char *value);
-static RBnode *_rbt_put(RBnode *root, int key, const char *value);
-static RBnode *_rbt_min(RBnode *node);
-static RBnode *_rbt_max(RBnode *node);
-static RBnode *_rbt_select(RBnode *node, int key);
-static RBnode *_rbt_floor(RBnode *node, int key);
-static RBnode *_rbt_ceiling(RBnode *node, int key);
-static RBnode *_rbt_delete_min(RBnode *node, bool flag);
-static RBnode *_rbt_delete_max(RBnode *node, bool flag);
-static RBnode *_rbt_delete(RBnode *node, int key);
+static void rbt_flip_colors(RBTnode *node);
+static RBTnode *rbt_rotate_left(RBTnode *node);
+static RBTnode *rbt_rotate_right(RBTnode *node);
+static RBTnode *rbt_new_node(int key, const char *value);
+static RBTnode *_rbt_put(RBTnode *root, int key, const char *value);
+static RBTnode *_rbt_min(RBTnode *node);
+static RBTnode *_rbt_max(RBTnode *node);
+static RBTnode *_rbt_select(RBTnode *node, int key);
+static RBTnode *_rbt_floor(RBTnode *node, int key);
+static RBTnode *_rbt_ceiling(RBTnode *node, int key);
+static RBTnode *_rbt_delete_min(RBTnode *node, bool flag);
+static RBTnode *_rbt_delete_max(RBTnode *node, bool flag);
+static RBTnode *_rbt_delete(RBTnode *node, int key);
 
 
-static RBnode *rbt_rotate_left(RBnode *node) {
+static RBTnode *rbt_rotate_left(RBTnode *node) {
 
-	RBnode *temp = node->right;
+	RBTnode *temp = node->right;
 	node->right = temp->left;
 	temp->left  = node;
 	temp->color = node->color;
@@ -46,9 +46,9 @@ static RBnode *rbt_rotate_left(RBnode *node) {
 	return temp;
 }
 
-static RBnode *rbt_rotate_right(RBnode *node) {
+static RBTnode *rbt_rotate_right(RBTnode *node) {
 
-	RBnode *temp = node->left;
+	RBTnode *temp = node->left;
 	node->left  = temp->right;
 	temp->right = node;
 	temp->color = node->color;
@@ -59,17 +59,17 @@ static RBnode *rbt_rotate_right(RBnode *node) {
 	return temp;
 }
 
-static void rbt_flip_colors(RBnode *node) {
+static void rbt_flip_colors(RBTnode *node) {
 
 	node->color        = !node->color;
 	node->left->color  = !node->left->color;
 	node->right->color = !node->right->color;
 }
 
-static RBnode *rbt_new_node(int key, const char *value) {
+static RBTnode *rbt_new_node(int key, const char *value) {
 
 	int len;
-	RBnode *node;
+	RBTnode *node;
 
 	node = malloc(sizeof(struct node));
 	if (node == NULL) {
@@ -92,13 +92,13 @@ static RBnode *rbt_new_node(int key, const char *value) {
 	return node;
 }
 
-void rbt_put(RBnode **root, int key, const char *value) {
+void rbt_put(RBTnode **root, int key, const char *value) {
 
 	*root = _rbt_put(*root, key, value);
 	(*root)->color = BLACK;
 }
 
-static RBnode *_rbt_put(RBnode *root, int key, const char *value) {
+static RBTnode *_rbt_put(RBTnode *root, int key, const char *value) {
 
 	int cmp, len;
 
@@ -134,7 +134,7 @@ static RBnode *_rbt_put(RBnode *root, int key, const char *value) {
 	return root;
 }
 
-char *rbt_get(RBnode *root, int key) {
+char *rbt_get(RBTnode *root, int key) {
 
 	int cmp;
 
@@ -150,17 +150,17 @@ char *rbt_get(RBnode *root, int key) {
 	return root->value;
 }
 
-bool rbt_isEmpty(RBnode *root) {
+bool rbt_isEmpty(RBTnode *root) {
 
 	return _rbt_size(root) == 0;
 }
 
-bool rbt_contains(RBnode *root, int key) {
+bool rbt_contains(RBTnode *root, int key) {
 
 	return rbt_get(root, key) != NULL;
 }
 
-int rbt_size(RBnode *node) {
+int rbt_size(RBTnode *node) {
 
 	if (node == NULL)
 		return 0;
@@ -168,7 +168,7 @@ int rbt_size(RBnode *node) {
 	return node->size;
 }
 
-int rbt_height(RBnode *root) {
+int rbt_height(RBTnode *root) {
 
 	if (root == NULL)
 		return -1;
@@ -181,7 +181,7 @@ static int max(int a, int b) {
 	return a > b ? a : b;
 }
 
-int rbt_min(RBnode *root) {
+int rbt_min(RBTnode *root) {
 
 	if (rbt_isEmpty(root))
 		return -1;
@@ -189,7 +189,7 @@ int rbt_min(RBnode *root) {
 	return _rbt_min(root)->key;
 }
 
-static RBnode *_rbt_min(RBnode *node) {
+static RBTnode *_rbt_min(RBTnode *node) {
 
 	if (node->left == NULL)
 		return node;
@@ -197,7 +197,7 @@ static RBnode *_rbt_min(RBnode *node) {
 	return _rbt_min(node->left);
 }
 
-int rbt_max(RBnode *root) {
+int rbt_max(RBTnode *root) {
 
 	if (rbt_isEmpty(root))
 		return -1;
@@ -205,7 +205,7 @@ int rbt_max(RBnode *root) {
 	return _rbt_max(root)->key;
 }
 
-static RBnode *_rbt_max(RBnode *node) {
+static RBTnode *_rbt_max(RBTnode *node) {
 
 	if (node->right == NULL)
 		return node;
@@ -213,19 +213,19 @@ static RBnode *_rbt_max(RBnode *node) {
 	return _rbt_max(node->right);
 }
 
-int rbt_floor(RBnode *root, int key) {
+int rbt_floor(RBTnode *root, int key) {
 
-	RBnode *node = _rbt_floor(root, key);
+	RBTnode *node = _rbt_floor(root, key);
 	if (node == NULL)
 		return -1;
 
 	return node->key;
 }
 
-static RBnode *_rbt_floor(RBnode *node, int key) {
+static RBTnode *_rbt_floor(RBTnode *node, int key) {
 
 	int cmp;
-	RBnode *temp;
+	RBTnode *temp;
 
 	if (node == NULL)
 		return NULL;
@@ -243,19 +243,19 @@ static RBnode *_rbt_floor(RBnode *node, int key) {
 	return node;
 }
 
-int rbt_ceiling(RBnode *root, int key) {
+int rbt_ceiling(RBTnode *root, int key) {
 
-	RBnode *node = _rbt_ceiling(root, key);
+	RBTnode *node = _rbt_ceiling(root, key);
 	if (node == NULL)
 		return -1;
 
 	return node->key;
 }
 
-static RBnode *_rbt_ceiling(RBnode *node, int key) {
+static RBTnode *_rbt_ceiling(RBTnode *node, int key) {
 
 	int cmp;
-	RBnode *temp;
+	RBTnode *temp;
 
 	if (node == NULL)
 		return NULL;
@@ -272,7 +272,7 @@ static RBnode *_rbt_ceiling(RBnode *node, int key) {
 	return _rbt_ceiling(node->right, key);
 }
 
-int rbt_size_range(RBnode *root, int lo, int hi) {
+int rbt_size_range(RBTnode *root, int lo, int hi) {
 
 	if (lo > hi)
 		return 0;
@@ -282,7 +282,7 @@ int rbt_size_range(RBnode *root, int lo, int hi) {
 	return rbt_rank(root, hi) - rbt_rank(root, lo);
 }
 
-int rbt_rank(RBnode *root, int key) {
+int rbt_rank(RBTnode *root, int key) {
 
 	int cmp;
 
@@ -298,7 +298,7 @@ int rbt_rank(RBnode *root, int key) {
 	return _rbt_size(root->left);
 }
 
-int rbt_select(RBnode *root, int k) {
+int rbt_select(RBTnode *root, int k) {
 
 	if (k < 0 || k >= _rbt_size(root))
 		return -1;
@@ -306,7 +306,7 @@ int rbt_select(RBnode *root, int k) {
 	return _rbt_select(root, k)->key;
 }
 
-static RBnode *_rbt_select(RBnode *node, int k) {
+static RBTnode *_rbt_select(RBTnode *node, int k) {
 
 	int test;
 
@@ -322,7 +322,7 @@ static RBnode *_rbt_select(RBnode *node, int k) {
 	return node;
 }
 
-void rbt_delete_min(RBnode **root) {
+void rbt_delete_min(RBTnode **root) {
 
 	if (rbt_isEmpty(*root))
 		*root = NULL;
@@ -330,9 +330,9 @@ void rbt_delete_min(RBnode **root) {
 	*root = _rbt_delete_min(*root, true);
 }
 
-static RBnode *_rbt_delete_min(RBnode *node, bool flag) {
+static RBTnode *_rbt_delete_min(RBTnode *node, bool flag) {
 
-	RBnode *right;
+	RBTnode *right;
 
 	if (node->left == NULL) {
 		right = node->right;
@@ -348,7 +348,7 @@ static RBnode *_rbt_delete_min(RBnode *node, bool flag) {
 	return node;
 }
 
-void rbt_delete_max(RBnode **root) {
+void rbt_delete_max(RBTnode **root) {
 
 	if (rbt_isEmpty(*root))
 		*root = NULL;
@@ -356,9 +356,9 @@ void rbt_delete_max(RBnode **root) {
 	*root = _rbt_delete_max(*root, true);
 }
 
-static RBnode *_rbt_delete_max(RBnode *node, bool flag) {
+static RBTnode *_rbt_delete_max(RBTnode *node, bool flag) {
 
-	RBnode *left;
+	RBTnode *left;
 
 	if (node->right == NULL) {
 		left = node->left;
@@ -374,14 +374,14 @@ static RBnode *_rbt_delete_max(RBnode *node, bool flag) {
 	return node;
 }
 
-void rbt_delete(RBnode **root, int key) {
+void rbt_delete(RBTnode **root, int key) {
 
 	*root = _rbt_delete(*root, key);
 }
 
-static RBnode *_rbt_delete(RBnode *node, int key) {
+static RBTnode *_rbt_delete(RBTnode *node, int key) {
 
-	RBnode *temp;
+	RBTnode *temp;
 	int cmp;
 
 	if (node == NULL)
@@ -406,10 +406,11 @@ static RBnode *_rbt_delete(RBnode *node, int key) {
 		free(temp);
 	}
 	node->size = 1 + _rbt_size(node->left) + _rbt_size(node->right);
+
 	return node;
 }
 
-void rbt_print(RBnode *root) {
+void rbt_print(RBTnode *root) {
 
 	if (root == NULL)
 		return;
@@ -419,7 +420,7 @@ void rbt_print(RBnode *root) {
 	rbt_print(root->right);
 }
 
-void rbt_print_keys(RBnode *root, int lo, int hi) {
+void rbt_print_keys(RBTnode *root, int lo, int hi) {
 
 	int cmp_lo, cmp_hi;
 
@@ -437,9 +438,9 @@ void rbt_print_keys(RBnode *root, int lo, int hi) {
 		rbt_print_keys(root->right, lo, hi);
 }
 
-void rbt_destroy(RBnode *root) {
+void rbt_destroy(RBTnode *root) {
 
-	RBnode *left, *right;
+	RBTnode *left, *right;
 
 	if (root == NULL)
 		return;
